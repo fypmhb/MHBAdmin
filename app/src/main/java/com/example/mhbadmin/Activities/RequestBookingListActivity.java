@@ -135,7 +135,7 @@ public class RequestBookingListActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return FRequestBookingDetail.newInstance(sp.getString("sSubHallDocumentId" + (position + 1), null));
+            return FRequestBookingDetail.newInskktance(sp.getString("sSubHallDocumentId" + (position + 1), null));
         }
 
         @Override
