@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".Activities.RequestBookingDetailActivity">
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp">
+
+            <RelativeLayout
+                android:id="@+id/rv_request_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/_5sdp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_user_profile"
+                    android:layout_width="@dimen/_80sdp"
+                    android:layout_height="@dimen/_80sdp"
+                    android:background="@drawable/ic_admin_profile"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_5sdp"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:layout_toEndOf="@id/iv_user_profile"
+                    android:hint="Name"
+                    android:padding="@dimen/_5sdp"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_user_phone_no"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_user_name"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:layout_toEndOf="@id/iv_user_profile"
+                    android:hint="+9203*********"
+                    android:padding="@dimen/_5sdp"
+                    android:textColor="#000"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ll_request_booking_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/rv_request_detail"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_request_booking_time_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/square_round_white"
+                    android:gravity="center"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Request Time/Date  00:00:AM DD/MM/YYYY"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="bold|italic" />
+
+                <TableLayout
+                    android:id="@+id/tl_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/_10sdp"
+                    android:orientation="vertical"
+                    android:padding="@dimen/_5sdp">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#F0F3F3"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Email" />
+
+                        <TextView
+                            android:id="@+id/tv_user_email"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="User Name"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:id="@+id/tv_floor_no_"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="City" />
+
+                        <TextView
+                            android:id="@+id/tv_user_city"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="abc"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#F0F3F3"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Location" />
+
+                        <TextView
+                            android:id="@+id/tv_user_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="xyz"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TextView
+                        android:id="@+id/tv_sub_hall_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:padding="@dimen/_5sdp"
+                        android:text="Sub Hall Name"
+                        android:textColor="#000"
+                        android:textSize="@dimen/_15ssp"
+                        android:textStyle="bold|italic" />
+
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Timing" />
+
+                        <TextView
+                            android:id="@+id/tv_function_timing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="Day/Night"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#F0F3F3"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Date" />
+
+                        <TextView
+                            android:id="@+id/tv_function_date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="DD/MM/YYYY"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="No Of Guests" />
+
+                        <TextView
+                            android:id="@+id/tv_no_of_guests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="0"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#F0F3F3"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Dish" />
+
+                        <TextView
+                            android:id="@+id/tv_dish"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="Dish"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/_5sdp"
+                            android:text="Estimated Budget" />
+
+                        <TextView
+                            android:id="@+id/tv_estimated_budget"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:hint="0.0"
+                            android:padding="@dimen/_5sdp"
+                            android:textStyle="bold" />
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Other Detail"
+                    android:textColor="#000"
+                    android:textSize="@dimen/_15ssp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:id="@+id/tv_other_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:padding="@dimen/_5sdp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_request_booking_detail"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:text="Accept"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_15ssp" />
+
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_request_booking_detail"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_toEndOf="@id/tv_accept"
+                android:text="Cancel"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_15ssp" />
+
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fab_call"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:src="@drawable/ic_fab_message" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/_10sdp"
+        android:src="@drawable/ic_fab_call" />
+
+</RelativeLayout>

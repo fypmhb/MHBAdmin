@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        android:checked="false"
+        android:key="switch_hall_info"
+        android:summary="Switch on to edit hall information"
+        android:title="Update Hall Profile" />
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_hall_info"
+        android:summary="You can edit hall information"
+        android:title="Update Hall Information"
+        app:dependency="switch_hall_info" />
+
+
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_sub_hall_info"
+        android:summary="You can update sub hall information"
+        android:title="Update Sub Hall Info"
+        app:dependency="switch_hall_info" />
+
+
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_update_password"
+        android:summary="You can update hall password"
+        android:title="Update Password"
+        app:dependency="switch_hall_info" />
+
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_delete_sub_hall"
+        android:summary="You can delete sub hall"
+        android:title="Delete Sub Hall"
+        app:dependency="switch_hall_info" />
+
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_delete_entire_hall"
+        android:summary="You can delete entire hall including sub halls"
+        android:title="Delete Entire Hall"
+        app:dependency="switch_hall_info" />
+
+    <Preference
+        android:enabled="true"
+        android:icon="@drawable/ic_navigation"
+        android:key="p_add_hall"
+        android:summary="You can add more sub halls"
+        android:title="Add Sub Hall" />
+
+</PreferenceScreen>
