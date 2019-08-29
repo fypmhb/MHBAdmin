@@ -29,15 +29,12 @@ import com.example.mhbadmin.AdapterClasses.SelectImagesAdapter;
 import com.example.mhbadmin.Classes.CCustomToast;
 import com.example.mhbadmin.Classes.CGetImageName;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.CSubHallData;
-import com.example.mhbadmin.Classes.CUploadSubHallDataToFireBase;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
+import com.example.mhbadmin.Classes.Upload.CUploadSubHallData;
 import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +42,13 @@ import java.util.List;
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_REQUEST_CODE;
 import static com.example.mhbadmin.Fragments.FSubHallMarqueeDetail.S_SUB_HALL_DOCUMENT_ID;
+import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
 public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+    static final String S_SUB_HALL_OBJECT_ID = "S_SUB_HALL_OBJECT_ID";
 
     private RelativeLayout rlCloseKeyboard = null;
 
@@ -59,8 +59,6 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
     private CCustomToast cCustomToast = null;
 
     private CSubHallData cSubHallData = null;
-
-    private FirebaseFirestore firebaseFirestore = null;
 
     private RecyclerView rvAddHall = null;
     private List<String> sLAddHallImagesUri = null,
@@ -92,8 +90,6 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
             srbNan = null,
             srbRise = null;
 
-    private boolean intentFlag = false;
-
     private Button btnUpdateSubHallInfo = null;
 
     //FireBase work
@@ -104,7 +100,8 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
 
     private String userId = null,
             sHallMarquee = null,
-            sSubHallDocumentId = null;
+            sSubHallDocumentId = null,
+            sSubHallObjectId = null;
 
     private int noOfTabs = 0;
 
@@ -115,9 +112,11 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         noOfTabs = getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : 1;
         if (getArguments() != null) {
             sSubHallDocumentId = getArguments().getString(S_SUB_HALL_DOCUMENT_ID);
+            sSubHallObjectId = getArguments().getString(S_SUB_HALL_OBJECT_ID);
         }
     }
 
@@ -126,8 +125,20 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_update_sub_hall_info, container, false);
 
-        //connectivity
+        connectivity();
 
+        setClickListeners();
+
+        settingUpRecyclerViewAdapter();
+
+        settingAdapterClickListener();
+
+        checkFireBaseState();
+
+        return view;
+    }
+
+    private void connectivity() {
         context = getActivity();
 
         cCustomToast = new CCustomToast();
@@ -138,7 +149,6 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
 
         progressDialog = new ProgressDialog(context);
 
-        firebaseFirestore = FirebaseFirestore.getInstance();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         rlCloseKeyboard = (RelativeLayout) view.findViewById(R.id.rl_hide_soft_keyboard);
@@ -152,7 +162,7 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
 
         ivUploadImage = (ImageView) view.findViewById(R.id.iv_upload_image);
 
-        selectImagesAdapter = new SelectImagesAdapter(getActivity(),sLAddHallImagesUri, sLAddHallImageNames, rvAddHall, ivUploadImage);
+        selectImagesAdapter = new SelectImagesAdapter(getActivity(), sLAddHallImagesUri, sLAddHallImageNames, rvAddHall, ivUploadImage);
 
         etSubHallName = (EditText) view.findViewById(R.id.et_sub_hall_name);
         etSubHallFloorNo = (EditText) view.findViewById(R.id.et_sub_hall_floor_no);
@@ -169,15 +179,6 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
 
         btnUpdateSubHallInfo = (Button) view.findViewById(R.id.btn_update_sub_hall_info);
 
-        setClickListeners();
-
-        settingUpRecyclerViewAdapter();
-
-        settingAdapterClickListener();
-
-        checkFireBaseState();
-
-        return view;
     }
 
     private void setClickListeners() {
@@ -233,29 +234,39 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         if (sHallMarquee.equals("Marquee"))
             etSubHallFloorNo.setVisibility(View.GONE);
 
-        getDataFromFireBase();
-
+        getDataFromSharedPreferences();
     }
 
-    private void getDataFromFireBase() {
-        final DocumentReference documentReference = firebaseFirestore.collection(sHallMarquee)
-                .document(userId)
-                .collection("Sub Hall info")
-                .document(sSubHallDocumentId);
+    private void getDataFromSharedPreferences() {
 
-        documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            cSubHallData = documentSnapshot.toObject(CSubHallData.class);
-                            showDataOnView();
-                        }
-                    }
-                });
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+
+        String cSubHallObject = sp.getString(sSubHallObjectId, null);
+        cSubHallData = new Gson().fromJson(cSubHallObject, CSubHallData.class);
+
+        showDataOnView();
     }
+
 
     private void showDataOnView() {
+
+        List<String> sample = cSubHallData.getsLGetAddHallImagesDownloadUri();
+
+        for (int i = 0; i < sample.size(); i++) {
+            sLAddHallImagesUri.add(sample.get(i));
+            sLGetAddHallImagesDownloadUri.add(sample.get(i));
+            sLAddHallImageNames.add(i + "d");
+        }
+        sLAddHallImagesUri.add(Uri.parse("android.resource://com.example.mhbadmin/drawable/ic_upload_image").toString());
+        sLAddHallImageNames.add("ic_upload_image");
+
+        selectImagesAdapter.notifyDataSetChanged();
+
+        ivUploadImage.setVisibility(View.GONE);
+        rvAddHall.setVisibility(View.VISIBLE);
 
         etSubHallName.setText(cSubHallData.getsSubHallName());
 
@@ -304,7 +315,6 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         } else if (v.getId() == R.id.iv_upload_image) {
             intentForOpenGallery();
         } else if (v.getId() == R.id.btn_update_sub_hall_info) {
-            intentFlag = true;
             uploadDataToFireBaseAndIntent();
         }
     }
@@ -337,12 +347,59 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
 
         //FireBase work
 
+        //check and delete previous images if needed
+        deletePreviousSubHallImages();
+
+        CSubHallData cSubHallData = null;
+
+        if (!sSubHallFloorNo.equals("0")) {
+            cSubHallData = new CSubHallData(sSubHallName, sSubHallFloorNo, sSubHallCapacity, sChickenRate,
+                    sMuttonRate, sBeefRate, srbSweetDish, srbSalad, srbDrink, srbNan, srbRise,
+                    sLGetAddHallImagesDownloadUri);
+        } else {
+            cSubHallData = new CSubHallData(sSubHallName, sSubHallCapacity, sChickenRate, sMuttonRate, sBeefRate,
+                    srbSweetDish, srbSalad, srbDrink, srbNan, srbRise, sLGetAddHallImagesDownloadUri);
+        }
+
         //this int is used to check whether this class
         //is instantiated from addSubHallActivity (=0) or FUpdateSubHAllInfo (=noOfTabs).
-        new CUploadSubHallDataToFireBase(context, intentFlag, noOfTabs, sSubHallName,
-                sSubHallFloorNo, sSubHallCapacity, sChickenRate, sMuttonRate, sBeefRate,
-                srbSweetDish, srbSalad, srbDrink, srbNan, srbRise, userId, sLAddHallImagesUri,
-                sLAddHallImageNames, sLGetAddHallImagesDownloadUri, sHallMarquee);
+        //{but =0 is not "Sub Hall Counter}
+        new CUploadSubHallData(context, cSubHallData, true, noOfTabs, sSubHallDocumentId,
+                userId, sLAddHallImagesUri, sLAddHallImageNames, sHallMarquee);
+    }
+
+    private void deletePreviousSubHallImages() {
+
+        progressDialog.setMessage("Deleting Previous Hall Entrance Images...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+
+        int uriSize = sLAddHallImagesUri.size();
+        int downloadSize = sLGetAddHallImagesDownloadUri.size();
+
+        int i = 0;
+
+        try {
+            while (i < downloadSize) {
+                int j = 0;
+                while (j < uriSize) {
+                    if (sLGetAddHallImagesDownloadUri.get(i).equals(sLAddHallImagesUri.get(j))) {
+                        i++;
+                        j = 0;
+                    } else {
+                        j++;
+                    }
+                }
+                getInstance().getReferenceFromUrl(sLGetAddHallImagesDownloadUri.get(i))
+                        .delete();
+                i++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        progressDialog.dismiss();
     }
 
     private void getDataFromView() {
@@ -517,11 +574,13 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public static FUpdateSubHallInfo newInstance(int sectionNumber, String sSubHallDocumentId) {
+    public static FUpdateSubHallInfo newInstance(int sectionNumber, String sSubHallDocumentId, String sSubHallObjectId) {
         FUpdateSubHallInfo fragment = new FUpdateSubHallInfo();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         args.putString(S_SUB_HALL_DOCUMENT_ID, sSubHallDocumentId);
+        args.putString(S_SUB_HALL_OBJECT_ID, sSubHallObjectId);
+
         fragment.setArguments(args);
         return fragment;
     }

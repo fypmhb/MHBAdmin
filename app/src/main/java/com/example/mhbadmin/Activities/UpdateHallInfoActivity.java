@@ -34,15 +34,17 @@ import com.example.mhbadmin.AdapterClasses.SelectImagesAdapter;
 import com.example.mhbadmin.Classes.CCustomToast;
 import com.example.mhbadmin.Classes.CGetImageName;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.CSignUpData;
-import com.example.mhbadmin.Classes.CUploadHallDataToFireBase;
+import com.example.mhbadmin.Classes.Models.CSignUpData;
+import com.example.mhbadmin.Classes.Upload.CUploadSignUpData;
 import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.santalu.maskedittext.MaskEditText;
 
 import java.io.ByteArrayOutputStream;
@@ -51,6 +53,7 @@ import java.util.List;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_REQUEST_CODE;
+import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
 public class UpdateHallInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,21 +64,27 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
     private CCustomToast cCustomToast = null;
 
     private SelectImagesAdapter selectImagesAdapter = null;
-    private ImageView ivUploadImage = null;
-    private ImageView ivManagerProfile = null,
+
+    private ImageView ivUploadImage = null,
+            ivManagerProfile = null,
             ivAddManagerProfile = null;
+
     private List<String> sLHallEntranceImagesUri = null,
             sLHallEntranceImageNames = null,
             sLGetHallEntranceImagesDownloadUri = null;
 
     private String sManagerProfileName = null,
             sManagerProfileDownloadUri = null;
+
     private Uri uriManagerProfile = null;
+
+    private String uriOldManagerProfile = null;
+
     private boolean bImageFlag = false;
+
     private EditText etHallMarqueeName = null,
             etManagerFirstName = null,
             etManagerLastName = null,
-            etHallMarqueeEmail = null,
             etHallMarqueeCity = null,
             etHallMarqueeLocation = null;
 
@@ -108,7 +117,7 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
 
     private ProgressDialog progressDialog = null;
 
-    private FirebaseFirestore firebaseFirestore = null;
+    private FirebaseDatabase firebaseDatabase = null;
 
     private String userId = null,
             sHallMarquee = null;
@@ -141,7 +150,7 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
 
         progressDialog = new ProgressDialog(this);
 
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         rlCloseKeyboard = (RelativeLayout) findViewById(R.id.rl_hide_soft_keyboard);
@@ -162,7 +171,6 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
         etHallMarqueeName = (EditText) findViewById(R.id.et_hall_marquee_name);
         etManagerFirstName = (EditText) findViewById(R.id.et_first_name);
         etManagerLastName = (EditText) findViewById(R.id.et_last_name);
-        etHallMarqueeEmail = (EditText) findViewById(R.id.et_hall_marquee_email);
         metHallMarqueePhoneNo = (MaskEditText) findViewById(R.id.met_hall_marquee_phone_no);
         etHallMarqueeCity = (EditText) findViewById(R.id.et_hall_marquee_city);
         etHallMarqueeLocation = (EditText) findViewById(R.id.et_hall_marquee_location);
@@ -230,33 +238,66 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
         if (sp.getString(META_DATA, null) != null)
             sHallMarquee = sp.getString(META_DATA, null);
 
+        //check Internet Connection
+        if (!checkInternetConnection()) {
+            return;
+        }
+
         getDataFromFireBase();
     }
 
     private void getDataFromFireBase() {
-        final DocumentReference documentReference = firebaseFirestore
-                .collection(sHallMarquee)
-                .document(userId)
-                .collection(sHallMarquee + " info")
-                .document(sHallMarquee + " Document");
 
-        documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        final DatabaseReference databaseReference = firebaseDatabase
+                .getReference(sHallMarquee)
+                .child(userId)
+                .child(sHallMarquee + " info");
+
+        databaseReference
+                .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            cSignUpData = documentSnapshot.toObject(CSignUpData.class);
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            cSignUpData = dataSnapshot.getValue(CSignUpData.class);
                             showDataOnView();
                         }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
     }
 
     private void showDataOnView() {
+
+        Glide.with(getApplicationContext())
+                .load(cSignUpData.getsManagerProfileImageUri())
+                .into(ivManagerProfile);
+
+        uriManagerProfile = Uri.parse(cSignUpData.getsManagerProfileImageUri());
+        uriOldManagerProfile = cSignUpData.getsManagerProfileImageUri();
+        sManagerProfileName = "mProfile";
+
+        List<String> sample = cSignUpData.getsLHallEntranceDownloadImagesUri();
+
+        for (int i = 0; i < sample.size(); i++) {
+            sLHallEntranceImagesUri.add(sample.get(i));
+            sLGetHallEntranceImagesDownloadUri.add(sample.get(i));
+            sLHallEntranceImageNames.add(i + "d");
+        }
+        sLHallEntranceImagesUri.add(Uri.parse("android.resource://com.example.mhbadmin/drawable/ic_upload_image").toString());
+        sLHallEntranceImageNames.add("ic_upload_image");
+
+        selectImagesAdapter.notifyDataSetChanged();
+
+        ivUploadImage.setVisibility(View.GONE);
+        rvHallInfo.setVisibility(View.VISIBLE);
+
         etHallMarqueeName.setText(cSignUpData.getsHallMarqueeName());
         etManagerFirstName.setText(cSignUpData.getsManagerFirstName());
         etManagerLastName.setText(cSignUpData.getsManagerLastName());
-        etHallMarqueeEmail.setText(cSignUpData.getsEmail());
         metHallMarqueePhoneNo.setText(cSignUpData.getsPhoneNo());
         etHallMarqueeCity.setText(cSignUpData.getsCity());
         etHallMarqueeLocation.setText(cSignUpData.getsLocation());
@@ -272,27 +313,6 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
 
         if (cSignUpData.getsParking().equals("Yes"))
             cbParking.setChecked(true);
-
-        Glide.with(getApplicationContext())
-                .load(cSignUpData.getsManagerProfileImageUri())
-                .into(ivManagerProfile);
-
-        uriManagerProfile = Uri.parse(cSignUpData.getsManagerProfileImageUri());
-        sManagerProfileName = cSignUpData.getsManagerProfileImageUri();
-
-        List<String> sample = cSignUpData.getsLHallEntranceDownloadImagesUri();
-
-        for (int i = 0; i < sample.size(); i++) {
-            sLHallEntranceImageNames.add(i + "d");
-            sLHallEntranceImagesUri.add(sample.get(i));
-        }
-        sLHallEntranceImagesUri.add(Uri.parse("android.resource://com.example.mhbadmin/drawable/ic_upload_image").toString());
-        sLHallEntranceImageNames.add("ic_upload_image");
-
-        selectImagesAdapter.notifyDataSetChanged();
-
-        ivUploadImage.setVisibility(View.GONE);
-        rvHallInfo.setVisibility(View.VISIBLE);
 
         progressDialog.dismiss();
     }
@@ -416,12 +436,75 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
             return;
         }
 
-        //FireBase work
-        new CUploadHallDataToFireBase(this, uriManagerProfile, sHallMarqueeEmail,
-                null, sHallMarquee, sManagerProfileName, sManagerProfileDownloadUri, sHallMarqueeName,
-                sManagerFirstName, sManagerLastName, sHallMarqueePhoneNo, sHallMarqueeCity, sHallMarqueeLocation,
-                sSpotLights, sMusic, sACHeater, sParking, sLHallEntranceImagesUri, sLHallEntranceImageNames,
+        //check and delete previous images if needed
+        deletePreviousManagerProfile();
+
+        //check and delete previous images if needed
+        deletePreviousHallEntranceImages();
+
+        CSignUpData cSignUpData = new CSignUpData(sHallMarqueeName, sManagerFirstName, sManagerLastName,
+                sManagerProfileDownloadUri, sHallMarqueeEmail, sHallMarqueePhoneNo, sHallMarqueeCity,
+                sHallMarqueeLocation, sSpotLights, sMusic, sACHeater, sParking,
                 sLGetHallEntranceImagesDownloadUri);
+
+        //FireBase work
+        new CUploadSignUpData(this, cSignUpData, uriManagerProfile, null, sHallMarquee,
+                sManagerProfileName, sLHallEntranceImagesUri, sLHallEntranceImageNames);
+    }
+
+    private void deletePreviousManagerProfile() {
+
+        if (sManagerProfileName.equals("mProfile")) {
+
+            progressDialog.setMessage("Deleting Previous Manager Profile...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+
+            getInstance().getReferenceFromUrl(uriOldManagerProfile)
+                    .delete()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            progressDialog.dismiss();
+                        }
+                    });
+        }
+    }
+
+    private void deletePreviousHallEntranceImages() {
+
+        progressDialog.setMessage("Deleting Previous Hall Entrance Images...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+
+        int uriSize = sLHallEntranceImagesUri.size();
+        int downloadSize = sLGetHallEntranceImagesDownloadUri.size();
+
+        int i = 0;
+
+        try {
+            while (i < downloadSize) {
+                int j = 0;
+                while (j < uriSize) {
+                    if (sLGetHallEntranceImagesDownloadUri.get(i).equals(sLHallEntranceImagesUri.get(j))) {
+                        i++;
+                        j = 0;
+                    } else {
+                        j++;
+                    }
+                }
+                getInstance().getReferenceFromUrl(sLGetHallEntranceImagesDownloadUri.get(i))
+                        .delete();
+                i++;
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        progressDialog.dismiss();
     }
 
     private void getDataFromView() {
@@ -429,7 +512,7 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
         sHallMarqueeName = etHallMarqueeName.getText().toString().trim();
         sManagerFirstName = etManagerFirstName.getText().toString().trim();
         sManagerLastName = etManagerLastName.getText().toString().trim();
-        sHallMarqueeEmail = etHallMarqueeEmail.getText().toString().trim().toLowerCase();
+        sHallMarqueeEmail = cSignUpData.getsEmail();
         sHallMarqueePhoneNo = metHallMarqueePhoneNo.getText().toString().trim();
         sHallMarqueeCity = etHallMarqueeCity.getText().toString().trim();
         sHallMarqueeLocation = etHallMarqueeLocation.getText().toString().trim();
@@ -469,12 +552,6 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
             cCustomToast.makeText(getApplicationContext(), "Please select Manager Profile Picture");
             return false;
         }
-
-        if (hallInfoCValidations.validateEmail(etHallMarqueeEmail, sHallMarqueeEmail)) {
-            etHallMarqueeEmail.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.round_red));
-            return false;
-        } else
-            etHallMarqueeEmail.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.round_white));
 
         if (hallInfoCValidations.validatePhoneNo(metHallMarqueePhoneNo, sHallMarqueePhoneNo)) {
             metHallMarqueePhoneNo.setBackground(getApplicationContext().getResources().getDrawable(R.drawable.round_red));

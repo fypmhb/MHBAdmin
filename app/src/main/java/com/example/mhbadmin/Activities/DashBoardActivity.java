@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,23 +20,32 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.example.mhbadmin.Activities.FragmentRelated.HistoryActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.RequestBookingListActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.SubHallMarqueeDetailActivity;
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
-import com.example.mhbadmin.Classes.CSignUpData;
-import com.example.mhbadmin.Notification.Receiving.Token;
+import com.example.mhbadmin.Classes.AbstractClasses.BookingsDataBase;
+import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.Models.CRequestBookingData;
+import com.example.mhbadmin.Classes.Models.CSignUpData;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
+import com.example.mhbadmin.Classes.Models.CUserData;
+import com.example.mhbadmin.Notification.Token;
 import com.example.mhbadmin.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.example.mhbadmin.Service.SNotification;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
+import com.rupins.drawercardbehaviour.CardDrawerLayout;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,8 +54,11 @@ public class DashBoardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar toolbar = null;
-    private DrawerLayout drawer = null;
+    private CardDrawerLayout drawer = null;
+    private ActionBarDrawerToggle toggle = null;
     private NavigationView navigationView = null;
+
+    private boolean navigationFlag = false;
 
     private ViewPager mViewPager = null;
     private ImageView ivManagerProfile = null;
@@ -59,37 +73,46 @@ public class DashBoardActivity extends AppCompatActivity
 
     private SharedPreferences sp = null;
 
+    private SharedPreferences.Editor editor = null;
+
     public static final String META_DATA = "meta data";
     public static final String SUB_HALL_COUNTER = "Sub Hall Counter";
 
     private ProgressDialog progressDialog = null;
-    private FirebaseFirestore firebaseFirestore = null;
+    private FirebaseDatabase firebaseDatabase = null;
 
     private String sHallMarquee = null,
             userId = null;
 
     private CSignUpData cSignUpData = null;
 
+    //offline DataBase
+    BookingsDataBase db = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
+        navigationFlag = true;
+
         connectivity();
 
-        //Notification
-        updateToken(FirebaseInstanceId.getInstance().getToken());
+        startService(new Intent(getApplicationContext(), SNotification.class));
 
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        toggle = new ActionBarDrawerToggle(this, drawer, R.string.Open, R.string.Close);
+        drawer.useCustomBehavior(Gravity.START); //assign custom behavior for "Left" drawer
+        drawer.setViewScale(Gravity.START, 0.98f); //set height scale for main view (0f to 1f)
+        drawer.setViewElevation(Gravity.START, 20);//set main view elevation when drawer open (dimension)
+        drawer.setViewScrimColor(Gravity.START, Color.TRANSPARENT);//set drawer overlay coloe (color)
+        drawer.setDrawerElevation(Gravity.START, 20);//set drawer elevation (dimension)
+        drawer.setRadius(Gravity.START, 25);//set end container's corner radius (dimension)
+
         navigationView.setNavigationItemSelectedListener(this);
 
-        //FireBase Work
-        checkFireBaseState();
+        fireBaseWork();
     }
 
     private void connectivity() {
@@ -98,9 +121,11 @@ public class DashBoardActivity extends AppCompatActivity
 
         sp = getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
+        editor = sp.edit();
+
         progressDialog = new ProgressDialog(this);
 
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -112,99 +137,329 @@ public class DashBoardActivity extends AppCompatActivity
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (CardDrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
 
         tvNavigationDashBoardHallMarqueeName = (TextView) headerView.findViewById(R.id.tv_navigation_dash_board_hall_marquee_name);
+
+        //offline Database
+
+        db = BookingsDataBase.getInstance(this);
+    }
+
+    private void fireBaseWork() {
+
+        //check Internet Connection
+        if (!checkInternetConnection()) {
+            return;
+        }
+
+        //Notification
+        updateToken(FirebaseInstanceId.getInstance().getToken());
+
+        //for offline notification
+        getBookingsDataFromFireBase();
+
+        //FireBase Work
+        checkFireBaseState();
+    }
+
+    private boolean checkInternetConnection() {
+        // if there is no internet connection
+        CNetworkConnection CNetworkConnection = new CNetworkConnection();
+        if (CNetworkConnection.isConnected(DashBoardActivity.this)) {
+            CNetworkConnection.buildDialog(DashBoardActivity.this).show();
+            return false;
+        }
+        return true;
     }
 
     private void updateToken(String token) {
         Token token1 = new Token(token);
-
-        FirebaseFirestore.getInstance()
-                .collection("Tokens")
-                .document(userId)
-                .set(token1);
+        firebaseDatabase.getReference("Tokens").
+                child(userId).
+                setValue(token1);
     }
 
-    private void checkFireBaseState() {
+    private void getBookingsDataFromFireBase() {
+
         progressDialog.setMessage("Loading...");
         progressDialog.show();
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
 
-        DocumentReference documentReference = firebaseFirestore
-                .collection("Meta Data")
-                .document(userId);
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
+                .getReference("Accepted Requests")
+                .child("User Ids");
 
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    if (document.exists()) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
 
-                        sHallMarquee = document.getString("meta data");
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                        SharedPreferences.Editor editor = sp.edit();
-                        editor.putString(META_DATA, sHallMarquee);
-                        editor.commit();
+                        final String sClient = dataSnapshot1.getKey();
 
-                        getDataFromFireBase();
+                        assert sClient != null;
+                        FirebaseDatabase.getInstance().getReference("Users")
+                                .child(sClient)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        if (dataSnapshot.exists()) {
+
+                                            final CUserData cUserData = dataSnapshot.getValue(CUserData.class);
+
+                                            final DatabaseReference databaseReference1 = databaseReference
+                                                    .child(sClient)
+                                                    .child("Hall Ids")
+                                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                    .child("Sub Hall Ids");
+
+                                            databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                    if (dataSnapshot.exists()) {
+
+                                                        for (final DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
+
+                                                            final String sSubHallId = dataSnapshot2.getKey();
+
+                                                            assert sSubHallId != null;
+                                                            final DatabaseReference databaseReference2 = databaseReference1
+                                                                    .child(sSubHallId)
+                                                                    .child("Timing");
+
+                                                            databaseReference2.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    if (dataSnapshot.exists()) {
+
+                                                                        for (DataSnapshot dataSnapshot3 : dataSnapshot.getChildren()) {
+                                                                            final String sTiming = dataSnapshot3.getKey();
+
+                                                                            assert sTiming != null;
+                                                                            databaseReference2.child(sTiming)
+                                                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                        @Override
+                                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                            if (dataSnapshot.exists()) {
+
+                                                                                                CRequestBookingData cRequestBookingData = dataSnapshot.getValue(CRequestBookingData.class);
+
+                                                                                                assert cRequestBookingData != null;
+                                                                                                String sFunctionDate = cRequestBookingData.getsFunctionDate();
+
+                                                                                                int beforeFunctionDay = 0;
+                                                                                                if (sFunctionDate.charAt(1) != '-')
+                                                                                                    beforeFunctionDay = Integer.parseInt(sFunctionDate.substring(0, 2)) - 1;
+                                                                                                else
+                                                                                                    beforeFunctionDay = Integer.parseInt(sFunctionDate.substring(0, 1));
+
+
+                                                                                                assert cUserData != null;
+                                                                                                cUserData.setsUserID(sClient);
+                                                                                                cUserData.setsSubHallId(sSubHallId);
+                                                                                                cRequestBookingData.setsAcceptDeniedTiming(sTiming);
+
+                                                                                                //save data to SQLite Room
+
+                                                                                                Gson gson=new Gson();
+
+                                                                                                /*DBBookings dbBookings = new DBBookings(gson.toJson(cUserData), gson.toJson(cRequestBookingData), cRequestBookingData.getsFunctionDate());
+                                                                                                db.dbBookingsDao().insertAll(dbBookings);*/
+
+                                                                                               /* DateFormat dateFormat = new SimpleDateFormat("dd-M-yyyy");
+
+                                                                                                String sDate = dateFormat.format(new Date());
+
+                                                                                                List<DBBookings> dbBookingsList = db.dbBookingsDao().loadAllByFunctionDates(sDate);
+                                                                                                */
+                                                                                            }
+                                                                                        }
+
+                                                                                        @Override
+                                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                                        }
+                                                                                    });
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                     }
                 }
             }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
+
+    }
+
+    private void checkFireBaseState() {
+
+        firebaseDatabase.getReference("Meta Data")
+                .child(userId)
+                .child("meta data")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+
+                            sHallMarquee = dataSnapshot.getValue(String.class);
+
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putString(META_DATA, sHallMarquee);
+                            editor.commit();
+
+                            getDataFromFireBase();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void getDataFromFireBase() {
-        final DocumentReference documentReference = firebaseFirestore
-                .collection(sHallMarquee)
-                .document(userId)
-                .collection(sHallMarquee + " info")
-                .document(sHallMarquee + " Document");
 
-        documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        firebaseDatabase
+                .getReference(sHallMarquee)
+                .child(userId)
+                .child(sHallMarquee + " info")
+                .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            cSignUpData = documentSnapshot.toObject(CSignUpData.class);
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            cSignUpData = dataSnapshot.getValue(CSignUpData.class);
                             getSubHallNumbers();
                         }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
     }
 
     private void getSubHallNumbers() {
-        DocumentReference documentReference = firebaseFirestore
-                .collection(sHallMarquee)
-                .document(userId);
 
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        DatabaseReference databaseReference = firebaseDatabase
+                .getReference(sHallMarquee)
+                .child(userId)
+                .child("Sub Hall Counter");
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    if (document.exists()) {
-                        int addHallCount = 0;
-                        if (document.getString(SUB_HALL_COUNTER) != null) {
-                            addHallCount = Integer.parseInt(document.getString(SUB_HALL_COUNTER));
-                            SharedPreferences.Editor editor = sp.edit();
-                            editor.putInt(SUB_HALL_COUNTER, addHallCount);
-                            editor.commit();
-                            showDataOnView();
-                        }
-                    } else {
-                        SharedPreferences.Editor editor = sp.edit();
-                        editor.putInt(SUB_HALL_COUNTER, 0);
-                        editor.commit();
-                        showDataOnView();
-                    }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    int addHallCount = 0;
+//                    if (dataSnapshot.getValue() != null) {
+                    addHallCount = Integer.parseInt(dataSnapshot.getValue(String.class));
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt(SUB_HALL_COUNTER, addHallCount);
+                    editor.commit();
+                    getSubHallDocumentIdAndSubHallObject();
+//                    }
+                } else {
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putInt(SUB_HALL_COUNTER, 0);
+                    editor.commit();
+                    showDataOnView();
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getSubHallDocumentIdAndSubHallObject() {
+
+
+        final DatabaseReference databaseReference = firebaseDatabase
+                .getReference(sHallMarquee)
+                .child(userId)
+                .child("Sub Hall info");
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    int i = 1;
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        if (dataSnapshot1.exists()) {
+                            String sSubHallDocumentId = dataSnapshot1.getKey();
+                            editor.putString("sSubHallDocumentId" + i, sSubHallDocumentId);
+                            editor.commit();
+
+                            final int finalI = i;
+                            databaseReference.child(sSubHallDocumentId)
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                CSubHallData cSubHallData = dataSnapshot.getValue(CSubHallData.class);
+                                                editor.putString("sSubHallObject" + finalI, new Gson().toJson(cSubHallData));
+                                                //for update and delete purpose
+                                                editor.putString("sSubHallObjectId" + finalI, "sSubHallObject" + finalI);
+                                                editor.commit();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        }
+                        i += 1;
+                    }
+                    showDataOnView();
+                }
+                progressDialog.dismiss();
+                showDataOnView();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -234,10 +489,11 @@ public class DashBoardActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            editor.clear().commit();
             super.onBackPressed();
         }
     }
@@ -255,10 +511,13 @@ public class DashBoardActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            recreate();
+            fireBaseWork();
             return true;
         }
 
@@ -272,67 +531,89 @@ public class DashBoardActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-            finish();
+            if (!navigationFlag) {
+                startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                finish();
+            }
         } else if (id == R.id.nav_hall_detail) {
+            navigationFlag = false;
             startActivity(new Intent(getApplicationContext(), SubHallMarqueeDetailActivity.class));
         } else if (id == R.id.nav_requests) {
+            navigationFlag = false;
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("Request Booking", "Booking Requests");
+            editor.commit();
             startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
         } else if (id == R.id.nav_bookings) {
+            navigationFlag = false;
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("Request Booking", "Accepted Requests");
+            editor.commit();
             startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
         } else if (id == R.id.nav_history) {
-
+            navigationFlag = false;
+            startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
         } else if (id == R.id.nav_log_out) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure to log out?");
-            builder.setTitle("Please Confirm!");
-            builder.setCancelable(false);
-            builder.setPositiveButton("Log Out", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    FirebaseAuth.getInstance().signOut();
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.clear();
-                    editor.commit();
-                    startActivity(new Intent(getApplicationContext(), SplashScreenActivity.class));
-                    finish();
-                }
-            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog dialog1 = builder.create();
-            dialog1.show();
+            logOut();
         } else if (id == R.id.nav_settings) {
+            navigationFlag = false;
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_about_us) {
+            navigationFlag = false;
             startActivity(new Intent(this, AboutUsActivity.class));
         } else if (id == R.id.nav_share) {
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure to exit?");
-            builder.setTitle("Please Confirm!");
-            builder.setCancelable(false);
-            builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog dialog1 = builder.create();
-            dialog1.show();
+            exit();
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logOut() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure to log out?");
+        builder.setTitle("Please Confirm!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Log Out", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseAuth.getInstance().signOut();
+                SharedPreferences.Editor editor = sp.edit();
+                editor.clear();
+                editor.commit();
+                startActivity(new Intent(getApplicationContext(), SplashScreenActivity.class));
+                finish();
+            }
+        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog1 = builder.create();
+        dialog1.show();
+    }
+
+    private void exit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure to exit?");
+        builder.setTitle("Please Confirm!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog1 = builder.create();
+        dialog1.show();
     }
 
     // timer class for image swipe

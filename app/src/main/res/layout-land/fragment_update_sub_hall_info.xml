@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.AddSubHallActivity">
+
+    <RelativeLayout
+        android:id="@+id/rl_hide_soft_keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_10sdp">
+
+        <TextView
+            android:id="@+id/tv_add_sub_hall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Update Sub Hall Info"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/_25ssp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/tv_hall_images"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_add_sub_hall"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:imeOptions="actionNext"
+            android:padding="@dimen/_5sdp"
+            android:text="Select minimum 5 sub hall inner images"
+            android:textSize="@dimen/_20ssp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_select_hall_marquee_images"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_200sdp"
+            android:layout_below="@+id/tv_hall_images">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_hall_marquee_images"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:scrollbarSize="@dimen/_1sdp"
+                android:scrollbars="horizontal"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv_upload_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_upload_image" />
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/et_sub_hall_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_select_hall_marquee_images"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:background="@drawable/round_white"
+            android:hint="  Sub Hall Name"
+            android:imeOptions="actionNext"
+            android:inputType="textPersonName"
+            android:padding="@dimen/_5sdp"
+            android:backgroundTint="#E9D0D0"
+            android:textSize="@dimen/_20ssp"/>
+
+        <EditText
+            android:id="@+id/et_sub_hall_floor_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_sub_hall_name"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/round_white"
+            android:hint="  Sub Hall Floor No."
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:padding="@dimen/_5sdp"
+            android:backgroundTint="#E9D0D0"
+            android:textSize="@dimen/_20ssp"/>
+
+        <EditText
+            android:id="@+id/et_sub_hall_capacity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_sub_hall_floor_no"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/round_white"
+            android:hint="  Hall Capacity"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:padding="@dimen/_5sdp"
+            android:backgroundTint="#E9D0D0"
+            android:textSize="@dimen/_20ssp"/>
+
+        <TextView
+            android:id="@+id/tv_curry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_sub_hall_capacity"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:imeOptions="actionNext"
+            android:padding="@dimen/_5sdp"
+            android:text="Curry:"
+            android:textSize="@dimen/_20ssp"/>
+
+
+        <LinearLayout
+            android:id="@+id/ll_curry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_curry"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/tv_chicken"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:imeOptions="actionNext"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:padding="@dimen/_5sdp"
+                android:text="Chicken"
+                android:textSize="@dimen/_20ssp"/>
+
+            <TextView
+                android:id="@+id/tv_mutton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="Mutton"
+                android:textSize="@dimen/_20ssp"/>
+
+            <TextView
+                android:id="@+id/tv_beef"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="Beef"
+                android:textSize="@dimen/_20ssp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_curry"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <EditText
+                android:id="@+id/et_chicken_rate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:layout_weight="1"
+                android:background="@drawable/round_white"
+                android:hint="  Per Head"
+                android:inputType="number"
+                android:backgroundTint="#E9D0D0"
+                android:padding="@dimen/_7sdp" />
+
+            <EditText
+                android:id="@+id/et_mutton_rate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_15sdp"
+                android:layout_weight="1"
+                android:background="@drawable/round_white"
+                android:hint="  Per Head"
+                android:backgroundTint="#E9D0D0"
+                android:inputType="number"
+                android:padding="@dimen/_7sdp" />
+
+            <EditText
+                android:id="@+id/et_beef_rate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_20sdp"
+                android:layout_weight="1"
+                android:background="@drawable/round_white"
+                android:hint="  Per Head"
+                android:inputType="number"
+                android:backgroundTint="#E9D0D0"
+                android:padding="@dimen/_7sdp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_sweet_dish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_rate"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:text="Sweet Dish:" />
+
+            <RadioGroup
+                android:id="@+id/rg_sweet_dish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/rb_sweet_dish_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_65sdp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_sweet_dish_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_salad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_sweet_dish"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:text="Salad:" />
+
+            <RadioGroup
+                android:id="@+id/rg_salad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/rb_salad_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_salad_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_drink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_salad"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:text="Drink:" />
+
+            <RadioGroup
+                android:id="@+id/rg_drink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/rb_drink_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_drink_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_nan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_drink"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:text="Nan:" />
+
+            <RadioGroup
+                android:id="@+id/rg_nan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/rb_nan_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_nan_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_rise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_nan"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:imeOptions="actionNext"
+                android:padding="@dimen/_5sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:text="Rise:" />
+
+            <RadioGroup
+                android:id="@+id/rg_rise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <RadioButton
+                    android:id="@+id/rb_rise_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_rise_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="No" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_update_sub_hall_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_rise"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:background="@drawable/round_green"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:imeOptions="actionDone"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:textSize="@dimen/_20sdp"
+            android:text="Update"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+</ScrollView>

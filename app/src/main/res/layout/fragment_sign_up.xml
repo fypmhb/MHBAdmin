@@ -89,6 +89,7 @@
             android:layout_below="@id/rg_hall_marquee"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="  Hall Name"
             android:imeOptions="actionNext"
             android:inputType="textPersonName"
@@ -102,8 +103,8 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="-10dp"
             android:layout_marginEnd="@dimen/_2sdp"
-            android:src="@drawable/ic_admin_profile"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_admin_profile" />
 
         <ImageView
             android:id="@+id/iv_add_manager_profile"
@@ -136,6 +137,7 @@
             android:layout_marginBottom="@dimen/_10sdp"
             android:layout_toStartOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="First Name"
             android:imeOptions="actionNext"
             android:inputType="text"
@@ -151,6 +153,7 @@
             android:layout_marginBottom="@dimen/_10sdp"
             android:layout_toLeftOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="Last Name"
             android:imeOptions="actionNext"
             android:inputType="text"
@@ -163,6 +166,7 @@
             android:layout_below="@id/et_last_name"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_email"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Email"
@@ -177,13 +181,14 @@
             android:layout_below="@id/et_hall_marquee_email"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableStart="@drawable/ic_local_phone"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Phone No"
             android:imeOptions="actionNext"
             android:inputType="phone"
             android:padding="@dimen/_5sdp"
-            app:met_mask="+92###########" />
+            app:met_mask="+92##########" />
 
         <EditText
             android:id="@+id/et_hall_marquee_city"
@@ -192,6 +197,7 @@
             android:layout_below="@id/met_hall_marquee_phone_no"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_location_city"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall City"
@@ -206,6 +212,7 @@
             android:layout_below="@id/et_hall_marquee_city"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_location_pin"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Location"
@@ -220,6 +227,7 @@
             android:layout_below="@id/et_hall_marquee_location"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_vpn_key"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Password"
@@ -234,6 +242,7 @@
             android:layout_below="@id/et_hall_password"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableStart="@drawable/ic_vpn_key"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Confirm Password"

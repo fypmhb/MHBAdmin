@@ -1,16 +1,33 @@
 package com.example.mhbadmin.Activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.mhbadmin.Classes.CDeleteEntireHall;
+import com.example.mhbadmin.Activities.FragmentRelated.DeleteSubHallActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.UpdateSubHallInfoActivity;
+import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.Delete.CDeleteEntireHall;
 import com.example.mhbadmin.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -27,13 +44,15 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-        private Preference
-                //pSwitchHallInfo = null,
+
+        private Context context = null;
+
+        private Preference //pSwitchHallInfo = null,
                 pUpdateHallInfo = null,
                 pUpdateSubHallInfo = null,
                 pUpdatePassword = null,
                 pDeleteSubHall = null,
-                pDeleteHall = null,
+                pDeleteEntireHall = null,
                 pAddSubHAll = null;
 
         @Override
@@ -49,10 +68,10 @@ public class ProfileActivity extends AppCompatActivity {
 
                     if(switchHallInfo)
                     {
-                        Toast.makeText(getActivity(), "gg", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "gg", Toast.LENGTH_SHORT).show();
                     }
                     else
-                        Toast.makeText(getActivity(), "nn", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "nn", Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });*/
@@ -60,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
             pUpdateHallInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), UpdateHallInfoActivity.class));
+                    startActivity(new Intent(context, UpdateHallInfoActivity.class));
                     return false;
                 }
             });
@@ -68,7 +87,7 @@ public class ProfileActivity extends AppCompatActivity {
             pUpdateSubHallInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), UpdateSubHallInfoActivity.class));
+                    startActivity(new Intent(context, UpdateSubHallInfoActivity.class));
                     return false;
                 }
             });
@@ -76,7 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
             pUpdatePassword.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), UpdatePasswordActivity.class));
+                    startActivity(new Intent(context, UpdatePasswordActivity.class));
                     return false;
                 }
             });
@@ -84,32 +103,17 @@ public class ProfileActivity extends AppCompatActivity {
             pDeleteSubHall.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), DeleteSubHallActivity.class));
+                    startActivity(new Intent(context, DeleteSubHallActivity.class));
                     return false;
                 }
             });
 
-            pDeleteHall.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            pDeleteEntireHall.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Are you sure to delete entire hall?\nThis will delete all sub halls too.");
-                    builder.setTitle("Please Confirm!");
-                    builder.setCancelable(false);
-                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            new CDeleteEntireHall(getActivity());
-                        }
-                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog1 = builder.create();
-                    dialog1.show();
+                    showConfirmationDialog();
+
                     return false;
                 }
             });
@@ -117,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity {
             pAddSubHAll.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(getActivity(), AddSubHallActivity.class));
+                    startActivity(new Intent(context, AddSubHallActivity.class));
                     return false;
                 }
             });
@@ -125,13 +129,105 @@ public class ProfileActivity extends AppCompatActivity {
 
         private void connectivity() {
 
+            context = getActivity();
+
             //pSwitchHallInfo = (Preference) findPreference("switch_hall_info");
             pUpdateHallInfo = (Preference) findPreference("p_hall_info");
             pUpdateSubHallInfo = (Preference) findPreference("p_sub_hall_info");
             pUpdatePassword = (Preference) findPreference("p_update_password");
             pDeleteSubHall = (Preference) findPreference("p_delete_sub_hall");
-            pDeleteHall = (Preference) findPreference("p_delete_entire_hall");
+            pDeleteEntireHall = (Preference) findPreference("p_delete_entire_hall");
             pAddSubHAll = (Preference) findPreference("p_add_hall");
         }
+
+        private void showConfirmationDialog() {
+
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setCancelable(false);
+
+            View alertView = getActivity()
+                    .getLayoutInflater().inflate(R.layout.layout_get_password_to_delete_entire_hall, null);
+
+            builder.setView(alertView);
+
+            final EditText etGetPassword = (EditText) alertView.findViewById(R.id.et_get_password);
+            Button btnCancel = (Button) alertView.findViewById(R.id.btn_cancel);
+            Button btnDelete = (Button) alertView.findViewById(R.id.btn_delete);
+
+            final AlertDialog dialog = builder.create();
+
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+
+            btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    final ProgressDialog progressDialog = new ProgressDialog(context);
+
+                    String sPassword = etGetPassword.getText().toString().trim();
+
+                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                    AuthCredential authCredential = null;
+
+                    if (!sPassword.isEmpty()) {
+
+                        progressDialog.setMessage("Authenticating...");
+                        progressDialog.show();
+                        progressDialog.setCancelable(false);
+                        progressDialog.setCanceledOnTouchOutside(false);
+
+                        authCredential = EmailAuthProvider
+                                .getCredential(firebaseUser.getEmail(), sPassword);
+
+                        firebaseUser.reauthenticate(authCredential)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        progressDialog.dismiss();
+                                        dialog.dismiss();
+                                        new CDeleteEntireHall(context);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        etGetPassword.setBackground(getActivity().getResources().getDrawable(R.drawable.round_red));
+                                        progressDialog.dismiss();
+                                    }
+                                });
+                    } else {
+                        etGetPassword.setBackground(getActivity().getResources().getDrawable(R.drawable.round_red));
+                    }
+                }
+            });
+
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+        }
+
+        private boolean checkInternetConnection() {
+
+            // if there is no internet connection
+            CNetworkConnection CNetworkConnection = new CNetworkConnection();
+            if (CNetworkConnection.isConnected(context)) {
+                CNetworkConnection.buildDialog(context).show();
+                return false;
+            }
+            return true;
+        }
+
     }
 }

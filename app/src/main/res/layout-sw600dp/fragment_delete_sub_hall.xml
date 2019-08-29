@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll"
+            app:titleEnabled="true">
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/images_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/_30sdp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tv_sub_hall_average_per_head_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/square_round_white"
+                android:gravity="center"
+                android:padding="@dimen/_5sdp"
+                android:text="Average Per Head = 0.0"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_20ssp"
+                android:backgroundTint="#E9D0D0"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/tv_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:text="Detail"
+                android:textSize="@dimen/_20ssp"
+                android:textStyle="bold" />
+
+            <TableLayout
+                android:id="@+id/tl_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/_10sdp"
+                android:orientation="vertical"
+                android:padding="@dimen/_5sdp">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:text="Sub Hall Name"
+                        android:textSize="@dimen/_10ssp"/>
+
+                    <TextView
+                        android:id="@+id/tv_sub_hall_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="Hall Name"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/_10ssp"/>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/tv_floor_no_"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Floor No" />
+
+                    <TextView
+                        android:id="@+id/tv_floor_no"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="0"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Sub Hall Capacity" />
+
+                    <TextView
+                        android:id="@+id/tv_hall_capacity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="00"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Sweet Dish" />
+
+                    <TextView
+                        android:id="@+id/tv_sweet_dish"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="Yes/No"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:textStyle="bold" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Salad" />
+
+                    <TextView
+                        android:id="@+id/tv_salad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textSize="@dimen/_10ssp"
+                        android:hint="Yes/No"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Drink" />
+
+                    <TextView
+                        android:id="@+id/tv_drink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="Yes/No"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Nan" />
+
+                    <TextView
+                        android:id="@+id/tv_nan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="Yes/No"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Rise" />
+
+                    <TextView
+                        android:id="@+id/tv_rise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textSize="@dimen/_10ssp"
+                        android:hint="Yes/No"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TextView
+                    android:id="@+id/tv_curry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:text="Curry"
+                    android:textSize="@dimen/_20ssp"
+                    android:textStyle="bold" />
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:text="Chicken Per Head"
+                        android:textSize="@dimen/_10ssp"/>
+
+                    <TextView
+                        android:id="@+id/tv_chicken_per_head_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="00"
+                        android:textSize="@dimen/_10ssp"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:textSize="@dimen/_10ssp"
+                        android:text="Mutton Per Head" />
+
+                    <TextView
+                        android:id="@+id/tv_mutton_per_head_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="00"
+                        android:textSize="@dimen/_10ssp"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F0F3F3"
+                    android:padding="@dimen/_5sdp"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/_5sdp"
+                        android:text="Beef Per Head"
+                        android:textSize="@dimen/_10ssp"/>
+
+                    <TextView
+                        android:id="@+id/tv_beef_per_head_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:hint="00"
+                        android:textSize="@dimen/_10ssp"
+                        android:padding="@dimen/_5sdp"
+                        android:textStyle="bold" />
+
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/btn_delete_sub_hall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:background="@drawable/round_green"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:imeOptions="actionDone"
+                android:padding="@dimen/_5sdp"
+                android:text="Delete"
+                android:textSize="@dimen/_20ssp"
+                android:textColor="#ffffff" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

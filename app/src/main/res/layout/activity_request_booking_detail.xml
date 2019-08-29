@@ -66,7 +66,18 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_request_booking_time_date"
+                    android:id="@+id/tv_booking_request_cancel_accept_timing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Request Timing"
+                    android:textColor="#000"
+                    android:textSize="@dimen/_15ssp"
+                    android:textStyle="bold|italic" />
+
+                <TextView
+                    android:id="@+id/tv_booking_request_cancel_accept_time_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/square_round_white"
@@ -302,6 +313,31 @@
                 </TableLayout>
 
                 <TextView
+                    android:id="@+id/tv_booking_request_timing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Request Timing"
+                    android:textColor="#000"
+                    android:textSize="@dimen/_15ssp"
+                    android:textStyle="bold|italic"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_booking_request_time_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/square_round_white"
+                    android:gravity="center"
+                    android:padding="@dimen/_5sdp"
+                    android:text="Request Time/Date  00:00:AM DD/MM/YYYY"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="bold|italic"
+                    android:visibility="gone" />
+
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"
@@ -324,27 +360,28 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tv_accept"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/ll_request_booking_detail"
-                android:layout_marginStart="@dimen/_15sdp"
-                android:text="Accept"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="@dimen/_15ssp" />
-
-
-            <TextView
                 android:id="@+id/tv_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/ll_request_booking_detail"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:layout_toEndOf="@id/tv_accept"
+                android:layout_marginBottom="@dimen/_10sdp"
                 android:text="Cancel"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="@dimen/_15ssp" />
 
+
+            <TextView
+                android:id="@+id/tv_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ll_request_booking_detail"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:layout_toEndOf="@id/tv_cancel"
+                android:text="Accept"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_15ssp" />
 
         </RelativeLayout>
 

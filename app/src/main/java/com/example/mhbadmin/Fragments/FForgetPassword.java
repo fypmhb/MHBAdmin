@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mhbadmin.Classes.CCustomToast;
+import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -82,6 +83,12 @@ public class FForgetPassword extends Fragment implements View.OnClickListener {
     }
 
     private void resetPassword() {
+
+        //check Internet Connection
+        if (!checkInternetConnection()) {
+            return;
+        }
+
         String sEmail = etResetEmail.getText().toString().trim();
 
         CValidations forgetPasswordCValidations = new CValidations();
@@ -112,6 +119,16 @@ public class FForgetPassword extends Fragment implements View.OnClickListener {
                 cCustomToast.makeText(context, e.getMessage());
             }
         });
+    }
+
+    private boolean checkInternetConnection() {
+        // if there is no internet connection
+        CNetworkConnection CNetworkConnection = new CNetworkConnection();
+        if (CNetworkConnection.isConnected(context)) {
+            CNetworkConnection.buildDialog(context).show();
+            return false;
+        }
+        return true;
     }
 
     private void replaceFragment() {

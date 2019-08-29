@@ -1,7 +1,5 @@
 package com.example.mhbadmin.Activities;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,9 +8,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.example.mhbadmin.Classes.CRequestBookingData;
-import com.example.mhbadmin.Classes.CUserData;
+import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.Models.CRequestBookingData;
+import com.example.mhbadmin.Classes.Models.CUserData;
+import com.example.mhbadmin.Classes.RequestBooking.CAcceptRequest;
+import com.example.mhbadmin.Classes.RequestBooking.CCancelRequest;
 import com.example.mhbadmin.R;
+import com.example.mhbadmin.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
@@ -22,23 +24,29 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
 
     private CUserData cUserData = null;
 
-    private TextView tvRequestBookingTimeDate = null,
+    private TextView tvBookingRequestCancelAcceptTiming = null,
+            tvBookingRequestCancelAcceptTimeDate = null,
             tvUserName = null,
             tvPhoneNo = null,
             tvUserEmail = null,
             tvCity = null,
             tvLocation = null,
+            tvSubHallName = null,
             tvFunctionTiming = null,
             tvFunctionDate = null,
             tvNoOfGuests = null,
             tvDish = null,
             tvEstimatedBudget = null,
+            tvBookingRequestTiming = null,
+            tvBookingRequestTimeDate = null,
             tvOtherDetail = null,
             tvAccept = null,
             tvCancel = null;
 
     private FloatingActionButton fabMessage = null,
             fabCall = null;
+
+    private String sActivityName = null;
 
     private ImageView ivUserProfile = null;
 
@@ -62,7 +70,8 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
 
     private void connectivity() {
 
-        tvRequestBookingTimeDate = (TextView) findViewById(R.id.tv_request_booking_time_date);
+        tvBookingRequestCancelAcceptTiming = (TextView) findViewById(R.id.tv_booking_request_cancel_accept_timing);
+        tvBookingRequestCancelAcceptTimeDate = (TextView) findViewById(R.id.tv_booking_request_cancel_accept_time_date);
 
         tvUserName = (TextView) findViewById(R.id.tv_user_name);
         tvPhoneNo = (TextView) findViewById(R.id.tv_user_phone_no);
@@ -70,11 +79,15 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
         tvCity = (TextView) findViewById(R.id.tv_user_city);
         tvLocation = (TextView) findViewById(R.id.tv_user_location);
 
+        tvSubHallName = (TextView) findViewById(R.id.tv_sub_hall_name);
         tvFunctionTiming = (TextView) findViewById(R.id.tv_function_timing);
         tvFunctionDate = (TextView) findViewById(R.id.tv_function_date);
         tvNoOfGuests = (TextView) findViewById(R.id.tv_no_of_guests);
         tvDish = (TextView) findViewById(R.id.tv_dish);
         tvEstimatedBudget = (TextView) findViewById(R.id.tv_estimated_budget);
+        //below both are hidden for request detail and shown for accept, denied and success details.
+        tvBookingRequestTiming = (TextView) findViewById(R.id.tv_booking_request_timing);
+        tvBookingRequestTimeDate = (TextView) findViewById(R.id.tv_booking_request_time_date);
         tvOtherDetail = (TextView) findViewById(R.id.tv_other_detail);
 
         tvAccept = (TextView) findViewById(R.id.tv_accept);
@@ -92,6 +105,7 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
+            sActivityName = bundle.getString("sActivityName");
             cRequestBookingData = gson.fromJson(bundle.getString("requestBookingData"), CRequestBookingData.class);
             cUserData = gson.fromJson(bundle.getString("userData"), CUserData.class);
         }
@@ -103,7 +117,26 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
                 .load(cUserData.getsUserProfileImageUri())
                 .into(ivUserProfile);
 
-        tvRequestBookingTimeDate.setText(cRequestBookingData.getsRequestTime());
+        switch (sActivityName) {
+            case "Booking Requests":
+                tvBookingRequestCancelAcceptTimeDate.setText(cRequestBookingData.getsRequestTime());
+                break;
+            case "Accepted Requests":
+                tvBookingRequestCancelAcceptTiming.setText("Acceptance Timing");
+
+                setVisibilityOfTextViews();
+                break;
+            case "Denied Bookings":
+                tvBookingRequestCancelAcceptTiming.setText("Denied Timing");
+
+                setVisibilityOfTextViews();
+                break;
+            case "Succeed Bookings":
+                tvBookingRequestCancelAcceptTiming.setText("Success Timing");
+
+                setVisibilityOfTextViews();
+                break;
+        }
 
         tvUserName.setText(cUserData.getsUserFirstName() + " " + cUserData.getsUserLastName());
         tvPhoneNo.setText(cUserData.getsPhoneNo());
@@ -111,6 +144,7 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
         tvCity.setText(cUserData.getsCity());
         tvLocation.setText(cUserData.getsLocation());
 
+        tvSubHallName.setText(cRequestBookingData.getsSubHallName());
         tvFunctionTiming.setText(cRequestBookingData.getsFunctionTiming());
         tvFunctionDate.setText(cRequestBookingData.getsFunctionDate());
         tvNoOfGuests.setText(cRequestBookingData.getsNoOfGuests());
@@ -125,31 +159,48 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
             tvOtherDetail.setText("No extra detail is provided.");
     }
 
+    private void setVisibilityOfTextViews() {
+
+        tvBookingRequestCancelAcceptTimeDate.setText(cRequestBookingData.getsAcceptDeniedTiming());
+
+        tvBookingRequestTiming.setVisibility(View.VISIBLE);
+        tvBookingRequestTimeDate.setVisibility(View.VISIBLE);
+
+        tvBookingRequestTimeDate.setText(cRequestBookingData.getsRequestTime());
+
+        tvAccept.setVisibility(View.GONE);
+        tvCancel.setVisibility(View.GONE);
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fab_message) {
-            Intent messageIntent = new Intent();
-            messageIntent.setType("text/plain");
-            messageIntent.setAction(Intent.ACTION_SEND);
-            messageIntent.putExtra("address", cUserData.getsPhoneNo());
-            messageIntent.putExtra(Intent.EXTRA_TEXT, "Hello From App");
-
-            // Verify that the intent will resolve to an activity
-            if (messageIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(messageIntent);
-            }
-
+            String sMessageBody = "Hello From App";
+            Utils.sms(RequestBookingDetailActivity.this, cUserData.getsPhoneNo(), sMessageBody);
         } else if (v.getId() == R.id.fab_call) {
-            Intent callIntent = new Intent(Intent.ACTION_DIAL);
-            callIntent.setData(Uri.parse("tel:" + cUserData.getsPhoneNo()));
-            if (callIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(callIntent);
-            }
-
+            Utils.dial(RequestBookingDetailActivity.this, cUserData.getsPhoneNo());
         } else if (v.getId() == R.id.tv_cancel) {
-
-        } else if (v.getId() == R.id.iv_accept) {
-
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+            new CCancelRequest(this, false, cUserData.getsUserID(), cUserData.getsSubHallId(), cRequestBookingData);
+        } else if (v.getId() == R.id.tv_accept) {
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+            new CAcceptRequest(this, false, cUserData.getsUserID(), cUserData.getsSubHallId(), cRequestBookingData);
         }
+    }
+
+    private boolean checkInternetConnection() {
+        // if there is no internet connection
+        CNetworkConnection CNetworkConnection = new CNetworkConnection();
+        if (CNetworkConnection.isConnected(RequestBookingDetailActivity.this)) {
+            CNetworkConnection.buildDialog(RequestBookingDetailActivity.this).show();
+            return false;
+        }
+        return true;
     }
 }

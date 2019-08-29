@@ -60,7 +60,7 @@ public class CValidations {
         if (TextUtils.isEmpty(sPhoneNo)) {
             metPhoneNo.requestFocus();
             return true;
-        } else if (sPhoneNo.length() < 14) {
+        } else if (sPhoneNo.length() < 13) {
             metPhoneNo.setError("Please enter a valid phone no");
             metPhoneNo.requestFocus();
             return true;

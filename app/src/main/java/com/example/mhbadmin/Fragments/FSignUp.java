@@ -40,7 +40,8 @@ import com.example.mhbadmin.AdapterClasses.SelectImagesAdapter;
 import com.example.mhbadmin.Classes.CCustomToast;
 import com.example.mhbadmin.Classes.CGetImageName;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.CUploadHallDataToFireBase;
+import com.example.mhbadmin.Classes.Models.CSignUpData;
+import com.example.mhbadmin.Classes.Upload.CUploadSignUpData;
 import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
 import com.santalu.maskedittext.MaskEditText;
@@ -354,12 +355,15 @@ public class FSignUp extends Fragment implements View.OnClickListener {
             return;
         }
 
-        //FireBase work
-        new CUploadHallDataToFireBase(context, uriManagerProfile, sHallMarqueeEmail, sPassword,
-                srbHallMarquee, sManagerProfileName, sManagerProfileDownloadUri, sHallMarqueeName,
-                sManagerFirstName, sManagerLastName, sHallMarqueePhoneNo, sHallMarqueeCity, sHallMarqueeLocation,
-                sSpotLights, sMusic, sACHeater, sParking, sLHallEntranceImagesUri, sLHallEntranceImageNames,
+
+        CSignUpData cSignUpData = new CSignUpData(sHallMarqueeName, sManagerFirstName, sManagerLastName,
+                sManagerProfileDownloadUri, sHallMarqueeEmail, sHallMarqueePhoneNo, sHallMarqueeCity,
+                sHallMarqueeLocation, sSpotLights, sMusic, sACHeater, sParking,
                 sLGetHallEntranceImagesDownloadUri);
+
+        //FireBase work
+        new CUploadSignUpData(context, cSignUpData,uriManagerProfile, sPassword,
+                srbHallMarquee, sManagerProfileName, sLHallEntranceImagesUri, sLHallEntranceImageNames);
     }
 
     private void getDataFromView() {

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- External storage permission -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- gsf -->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" /> <!-- wifi state -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -20,16 +20,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.RequestBookingDetailActivity"
-            android:parentActivityName=".Activities.RequestBookingListActivity"/>
+        <activity android:name=".Activities.UserDetailActivity"/>
         <activity
-            android:name=".Activities.DeleteSubHallActivity"
+            android:name=".Activities.FragmentRelated.HistoryActivity"
+            android:parentActivityName=".Activities.DashBoardActivity" />
+        <activity
+            android:name=".Activities.RequestBookingDetailActivity"
+            android:parentActivityName=".Activities.FragmentRelated.RequestBookingListActivity" />
+        <activity
+            android:name=".Activities.FragmentRelated.DeleteSubHallActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
         <activity
             android:name=".Activities.AboutUsActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
         <activity
-            android:name=".Activities.UpdateSubHallInfoActivity"
+            android:name=".Activities.FragmentRelated.UpdateSubHallInfoActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
         <activity
             android:name=".Activities.UpdatePasswordActivity"
@@ -42,10 +47,10 @@
             android:parentActivityName=".Activities.DashBoardActivity" />
         <activity android:name=".Activities.AddSubHallActivity" />
         <activity
-            android:name=".Activities.SubHallMarqueeDetailActivity"
+            android:name=".Activities.FragmentRelated.SubHallMarqueeDetailActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
         <activity
-            android:name=".Activities.RequestBookingListActivity"
+            android:name=".Activities.FragmentRelated.RequestBookingListActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
         <activity
             android:name=".Activities.DashBoardActivity"
@@ -63,7 +68,7 @@
         </activity>
 
         <service
-            android:name=".Notification.Receiving.MyFiraBaseMessaging"
+            android:name=".Notification.Receiving.MyFireBaseMessaging"
             android:enabled="true"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -80,6 +85,10 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".Service.SNotification"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

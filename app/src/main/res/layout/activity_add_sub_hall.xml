@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.AddSubHallActivity">
+
     <RelativeLayout
         android:id="@+id/rl_hide_soft_keyboard"
         android:layout_width="match_parent"
@@ -62,6 +63,7 @@
             android:layout_below="@id/rl_select_hall_marquee_images"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="  Sub Hall Name"
             android:imeOptions="actionNext"
             android:inputType="textPersonName"
@@ -74,6 +76,7 @@
             android:layout_below="@id/et_sub_hall_name"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="  Sub Hall Floor No."
             android:imeOptions="actionNext"
             android:inputType="number"
@@ -86,6 +89,7 @@
             android:layout_below="@id/et_sub_hall_floor_no"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="  Hall Capacity"
             android:imeOptions="actionNext"
             android:inputType="number"
@@ -156,6 +160,7 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:background="@drawable/round_white"
+                android:backgroundTint="#E9D0D0"
                 android:hint="  Per Head"
 
                 android:inputType="number"
@@ -168,6 +173,7 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:background="@drawable/round_white"
+                android:backgroundTint="#E9D0D0"
                 android:hint="  Per Head"
                 android:inputType="number"
                 android:padding="@dimen/_7sdp" />
@@ -179,6 +185,7 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:background="@drawable/round_white"
+                android:backgroundTint="#E9D0D0"
                 android:hint="  Per Head"
                 android:inputType="number"
                 android:padding="@dimen/_7sdp" />
@@ -415,6 +422,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/_5sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
                 android:layout_weight="2"
                 android:background="@drawable/round_green"
                 android:backgroundTint="@color/colorPrimaryDark"
@@ -427,6 +435,7 @@
                 android:id="@+id/btn_done"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_10sdp"
                 android:layout_weight="1"
                 android:background="@drawable/round_green"
                 android:backgroundTint="@color/colorPrimaryDark"

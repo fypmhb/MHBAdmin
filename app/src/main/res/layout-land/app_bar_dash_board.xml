@@ -43,8 +43,11 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
+                android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:navigationIcon="@drawable/ic_nav"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

@@ -16,26 +16,26 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
-import com.example.mhbadmin.Classes.CCustomToast;
-import com.example.mhbadmin.Classes.CDeleteSubHall;
-import com.example.mhbadmin.Classes.CSubHallData;
+import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.Delete.CDeleteSubHall;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
 import com.example.mhbadmin.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 import static com.example.mhbadmin.Fragments.FSubHallMarqueeDetail.S_SUB_HALL_DOCUMENT_ID;
+import static com.example.mhbadmin.Fragments.FSubHallMarqueeDetail.S_SUB_HALL_OBJECT;
+import static com.example.mhbadmin.Fragments.FUpdateSubHallInfo.S_SUB_HALL_OBJECT_ID;
+
 
 public class FDeleteSubHall extends Fragment implements View.OnClickListener {
 
     private View view = null;
+
+    private Context context=null;
 
     private TextView tvAveragePerHeadRate = null,
             tvSubHallName = null,
@@ -60,16 +60,13 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
 
     private ProgressDialog progressDialog = null;
 
-    private String userId = null,
-            sHallMarquee = null;
+    private String sHallMarquee = null;
 
-    private FirebaseFirestore firebaseFirestore = null;
-
-    private String sSubHallDocumentId = null;
+    private String sSubHallDocumentId = null,
+            getsSubHallObjectId = null,
+            getsSubHallObject = null;
 
     private CSubHallData cSubHallData = null;
-
-    private CCustomToast cCustomToast = null;
 
     public FDeleteSubHall() {
         // Required empty public constructor
@@ -80,6 +77,8 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             sSubHallDocumentId = getArguments().getString(S_SUB_HALL_DOCUMENT_ID);
+            getsSubHallObjectId = getArguments().getString(S_SUB_HALL_OBJECT_ID);
+            getsSubHallObject = getArguments().getString(S_SUB_HALL_OBJECT);
         }
     }
 
@@ -100,11 +99,11 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
 
     private void connectivity() {
 
+        context=getActivity();
+
         sp = getActivity().getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
         progressDialog = new ProgressDialog(getActivity());
-
-        cCustomToast = new CCustomToast();
 
         tvAveragePerHeadRate = (TextView) view.findViewById(R.id.tv_sub_hall_average_per_head_rate);
         tvSubHallName = (TextView) view.findViewById(R.id.tv_sub_hall_name);
@@ -122,15 +121,10 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
         btnDeleteSubHall = (Button) view.findViewById(R.id.btn_delete_sub_hall);
 
         imageViewPager = (ViewPager) view.findViewById(R.id.images_view_pager);
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        userId = mAuth.getCurrentUser().getUid();
-
     }
 
     private void checkFireBaseState() {
+
 
         progressDialog.setMessage("Loading...");
         progressDialog.show();
@@ -140,37 +134,17 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
         if (sp.getString(META_DATA, null) != null)
             this.sHallMarquee = sp.getString(META_DATA, null);
 
-        getDataFromFireBase();
-
+        getDataFromSharedPreferences();
     }
 
-    private void getDataFromFireBase() {
+    private void getDataFromSharedPreferences() {
 
-        final DocumentReference documentReference1 = firebaseFirestore
-                .collection(sHallMarquee)
-                .document(userId)
-                .collection("Sub Hall info")
-                .document(sSubHallDocumentId);
+        cSubHallData = new Gson().fromJson(getsSubHallObject, CSubHallData.class);
 
-        documentReference1.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            cSubHallData = documentSnapshot.toObject(CSubHallData.class);
-                            showDataToView();
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                cCustomToast.makeText(getActivity(), e.getMessage());
-                progressDialog.dismiss();
-            }
-        });
+        showDataOnView();
     }
 
-    private void showDataToView() {
+    private void showDataOnView() {
 
         ImageSwipeAdapter imageSwipeAdapter = new ImageSwipeAdapter(getActivity(), cSubHallData.getsLGetAddHallImagesDownloadUri());
         imageViewPager.setAdapter(imageSwipeAdapter);
@@ -207,20 +181,40 @@ public class FDeleteSubHall extends Fragment implements View.OnClickListener {
         progressDialog.dismiss();
     }
 
-    public static FDeleteSubHall newInstance(String sSubHallDocumentId) {
+    public static FDeleteSubHall newInstance(String sSubHallDocumentId, String sSubHallObjectId, String sSubHallObject) {
         FDeleteSubHall fragment = new FDeleteSubHall();
         Bundle args = new Bundle();
         args.putString(S_SUB_HALL_DOCUMENT_ID, sSubHallDocumentId);
+        args.putString(S_SUB_HALL_OBJECT_ID, sSubHallObjectId);
+        args.putString(S_SUB_HALL_OBJECT, sSubHallObject);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.btn_delete_sub_hall) {
-            new CDeleteSubHall(getActivity(), true, sSubHallDocumentId, cSubHallData.getsLGetAddHallImagesDownloadUri());
-        }
 
+        if (view.getId() == R.id.btn_delete_sub_hall) {
+
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+
+            new CDeleteSubHall(context, true, sSubHallDocumentId, getsSubHallObjectId,
+                    true,cSubHallData.getsLGetAddHallImagesDownloadUri());
+        }
+    }
+
+    private boolean checkInternetConnection() {
+        // if there is no internet connection
+
+        CNetworkConnection CNetworkConnection = new CNetworkConnection();
+        if (CNetworkConnection.isConnected(context)) {
+            CNetworkConnection.buildDialog(context).show();
+            return false;
+        }
+        return true;
     }
 
     // timer class for image swipe

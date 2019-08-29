@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_100sdp"
+    android:layout_margin="@dimen/_5sdp"
+    android:background="@drawable/round_white"
+    android:padding="@dimen/_5sdp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_height="match_parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_user_profile"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_loading_image" />
+
+        <TextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:hint="abc"
+            android:padding="@dimen/_2sdp"
+            android:textSize="@dimen/_10ssp" />
+
+        <TextView
+            android:id="@+id/tv_user_phone_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_user_name"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:hint="xxxxxxxxxx"
+            android:padding="@dimen/_2sdp"
+            android:textSize="@dimen/_10ssp" />
+
+        <TextView
+            android:id="@+id/tv_booking_request_cancel_accept_time_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_user_phone_no"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:hint="02:09 PM 22\3\18"
+            android:padding="@dimen/_2sdp"
+            android:textSize="@dimen/_10ssp" />
+
+        <TextView
+            android:id="@+id/tv_user_location"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tv_booking_request_cancel_accept_time_date"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:hint="02:09 PM 22\3\18"
+            android:maxLines="2"
+            android:padding="@dimen/_2sdp"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_booking_request_cancel_accept_time_date"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:orientation="horizontal"
+            android:padding="@dimen/_2sdp"
+            android:weightSum="4">
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:textSize="@dimen/_10ssp" />
+
+            <ImageView
+                android:id="@+id/iv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_info" />
+
+            <TextView
+                android:id="@+id/tv_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_weight="1"
+                android:text="Accept"
+                android:textSize="@dimen/_10ssp" />
+
+            <ImageView
+                android:id="@+id/iv_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_info" />
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

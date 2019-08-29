@@ -15,13 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
-import com.example.mhbadmin.Classes.CSubHallData;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
 import com.example.mhbadmin.R;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,6 +27,7 @@ import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 public class FSubHallMarqueeDetail extends Fragment {
 
     static final String S_SUB_HALL_DOCUMENT_ID = "S_SUB_HALL_DOCUMENT_ID";
+    static final String S_SUB_HALL_OBJECT = "S_SUB_HALL_OBJECT";
 
     private View view = null;
 
@@ -55,14 +52,11 @@ public class FSubHallMarqueeDetail extends Fragment {
 
     private ProgressDialog progressDialog = null;
 
-    private String userId = null,
-            sHallMarquee = null;
+    private String sHallMarquee = null;
 
-    private FirebaseFirestore firebaseFirestore = null;
+    private String getsSubHallObject = null;
 
-    private String sSubHallDocumentId = null;
-
-    private CSubHallData CSubHallData = null;
+    private CSubHallData cSubHallData = null;
 
 
     public FSubHallMarqueeDetail() {
@@ -73,7 +67,7 @@ public class FSubHallMarqueeDetail extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            sSubHallDocumentId = getArguments().getString(S_SUB_HALL_DOCUMENT_ID);
+            getsSubHallObject = getArguments().getString(S_SUB_HALL_OBJECT);
         }
     }
 
@@ -109,11 +103,6 @@ public class FSubHallMarqueeDetail extends Fragment {
         tvBeefPerHeadRate = (TextView) view.findViewById(R.id.tv_beef_per_head_rate);
 
         imageViewPager = (ViewPager) view.findViewById(R.id.images_view_pager);
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        userId = mAuth.getCurrentUser().getUid();
     }
 
     private void checkFireBaseState() {
@@ -126,43 +115,31 @@ public class FSubHallMarqueeDetail extends Fragment {
         if (sp.getString(META_DATA, null) != null)
             this.sHallMarquee = sp.getString(META_DATA, null);
 
-        getDataFromFireBase();
+        getDataFromSharedPreferences();
     }
 
-    private void getDataFromFireBase() {
-        final DocumentReference documentReference1 = firebaseFirestore
-                .collection(sHallMarquee)
-                .document(userId)
-                .collection("Sub Hall info")
-                .document(sSubHallDocumentId);
+    private void getDataFromSharedPreferences() {
 
-        documentReference1.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            CSubHallData = documentSnapshot.toObject(CSubHallData.class);
-                            showDataToView();
-                        }
-                    }
-                });
+        cSubHallData = new Gson().fromJson(getsSubHallObject, CSubHallData.class);
+
+        showDataOnView();
     }
 
-    private void showDataToView() {
+    private void showDataOnView() {
 
-        ImageSwipeAdapter imageSwipeAdapter = new ImageSwipeAdapter(getActivity(), CSubHallData.getsLGetAddHallImagesDownloadUri());
+        ImageSwipeAdapter imageSwipeAdapter = new ImageSwipeAdapter(getActivity(), cSubHallData.getsLGetAddHallImagesDownloadUri());
         imageViewPager.setAdapter(imageSwipeAdapter);
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new MyTimerTask(), 3000, 4000);
 
-        int chickenPerHead = Integer.parseInt(CSubHallData.getsChickenPerHead()),
-                muttonPerHead = Integer.parseInt(CSubHallData.getsMuttonPerHead()),
-                beefPerHead = Integer.parseInt(CSubHallData.getsBeefPerHead());
+        int chickenPerHead = Integer.parseInt(cSubHallData.getsChickenPerHead()),
+                muttonPerHead = Integer.parseInt(cSubHallData.getsMuttonPerHead()),
+                beefPerHead = Integer.parseInt(cSubHallData.getsBeefPerHead());
         double averagePerHeadRate = (chickenPerHead + muttonPerHead + beefPerHead) / 3;
 
         tvAveragePerHeadRate.setText("Average Per Head = " + averagePerHeadRate);
-        tvSubHallName.setText(CSubHallData.getsSubHallName());
+        tvSubHallName.setText(cSubHallData.getsSubHallName());
 
         assert sHallMarquee != null;
         if (sHallMarquee.equals("Marquee")) {
@@ -170,25 +147,25 @@ public class FSubHallMarqueeDetail extends Fragment {
             TextView tvFloorNo_ = (TextView) view.findViewById(R.id.tv_floor_no_);
             tvFloorNo_.setVisibility(View.GONE);
         } else
-            tvFloorNo.setText(CSubHallData.getsSubHallFloorNo());
+            tvFloorNo.setText(cSubHallData.getsSubHallFloorNo());
 
-        tvHallCapacity.setText(CSubHallData.getsHallCapacity());
-        tvSweetDish.setText(CSubHallData.getsSweetDish());
-        tvSalad.setText(CSubHallData.getsSalad());
-        tvDrink.setText(CSubHallData.getsDrink());
-        tvNan.setText(CSubHallData.getsNan());
-        tvRise.setText(CSubHallData.getsRise());
-        tvChickenPerHead.setText(CSubHallData.getsChickenPerHead());
-        tvMuttonPerHeadRate.setText(CSubHallData.getsMuttonPerHead());
-        tvBeefPerHeadRate.setText(CSubHallData.getsBeefPerHead());
+        tvHallCapacity.setText(cSubHallData.getsHallCapacity());
+        tvSweetDish.setText(cSubHallData.getsSweetDish());
+        tvSalad.setText(cSubHallData.getsSalad());
+        tvDrink.setText(cSubHallData.getsDrink());
+        tvNan.setText(cSubHallData.getsNan());
+        tvRise.setText(cSubHallData.getsRise());
+        tvChickenPerHead.setText(cSubHallData.getsChickenPerHead());
+        tvMuttonPerHeadRate.setText(cSubHallData.getsMuttonPerHead());
+        tvBeefPerHeadRate.setText(cSubHallData.getsBeefPerHead());
 
         progressDialog.dismiss();
     }
 
-    public static FSubHallMarqueeDetail newInstance(String sSubHallDocumentId) {
+    public static FSubHallMarqueeDetail newInstance(String sSubHallObject) {
         FSubHallMarqueeDetail fragment = new FSubHallMarqueeDetail();
         Bundle args = new Bundle();
-        args.putString(S_SUB_HALL_DOCUMENT_ID, sSubHallDocumentId);
+        args.putString(S_SUB_HALL_OBJECT, sSubHallObject);
         fragment.setArguments(args);
         return fragment;
     }
@@ -196,7 +173,7 @@ public class FSubHallMarqueeDetail extends Fragment {
     // timer class for image swipe
     public class MyTimerTask extends TimerTask {
 
-        int numberOfHallEntranceImages = CSubHallData.getsLGetAddHallImagesDownloadUri().size() - 1;
+        int numberOfHallEntranceImages = cSubHallData.getsLGetAddHallImagesDownloadUri().size() - 1;
         int i = 0;
 
         @Override

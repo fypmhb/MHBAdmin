@@ -68,6 +68,7 @@
             android:background="@drawable/round_white"
             android:hint="  Hall/Marquee Name"
             android:imeOptions="actionNext"
+            android:backgroundTint="#E9D0D0"
             android:inputType="textPersonName"
             android:padding="@dimen/_5sdp" />
 
@@ -114,6 +115,7 @@
             android:layout_toStartOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
             android:hint="First Name"
+            android:backgroundTint="#E9D0D0"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:padding="@dimen/_5sdp" />
@@ -129,31 +131,19 @@
             android:layout_toLeftOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
             android:hint="Last Name"
+            android:backgroundTint="#E9D0D0"
             android:imeOptions="actionNext"
             android:inputType="text"
-            android:padding="@dimen/_5sdp" />
-
-        <EditText
-            android:id="@+id/et_hall_marquee_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/et_last_name"
-            android:layout_margin="@dimen/_10sdp"
-            android:background="@drawable/round_white"
-            android:drawableLeft="@drawable/ic_email"
-            android:drawablePadding="@dimen/_5sdp"
-            android:hint="  Hall/Marquee Email"
-            android:imeOptions="actionNext"
-            android:inputType="textEmailAddress"
             android:padding="@dimen/_5sdp" />
 
         <com.santalu.maskedittext.MaskEditText
             android:id="@+id/met_hall_marquee_phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_hall_marquee_email"
+            android:layout_below="@id/et_last_name"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableStart="@drawable/ic_local_phone"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall/Marquee Phone No"
@@ -166,6 +156,7 @@
             android:id="@+id/et_hall_marquee_city"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#E9D0D0"
             android:layout_below="@id/met_hall_marquee_phone_no"
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/round_white"
@@ -179,6 +170,7 @@
         <EditText
             android:id="@+id/et_hall_marquee_location"
             android:layout_width="match_parent"
+            android:backgroundTint="#E9D0D0"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_hall_marquee_city"
             android:layout_margin="@dimen/_10sdp"
@@ -197,6 +189,7 @@
             android:layout_below="@id/et_hall_marquee_location"
             android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/_10sdp"
+            android:backgroundTint="#E9D0D0"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
             android:text="Other Facilities" />
@@ -257,6 +250,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/ll_ac_heater_parking"
             android:layout_margin="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_20sdp"
             android:background="@drawable/round_green"
             android:backgroundTint="@color/colorPrimaryDark"
             android:imeOptions="actionDone"

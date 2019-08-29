@@ -70,11 +70,12 @@ public class FLogIn extends Fragment implements View.OnClickListener {
     }
 
     private void connectivity() {
+
         context = getActivity();
 
         cCustomToast = new CCustomToast();
 
-        progressDialog=new ProgressDialog(context);
+        progressDialog = new ProgressDialog(context);
 
         rlCloseKeyboard = (RelativeLayout) fragmentView.findViewById(R.id.rl_hide_soft_keyboard);
 
@@ -128,6 +129,7 @@ public class FLogIn extends Fragment implements View.OnClickListener {
     }
 
     private void showHidePassword() {
+
         //hide or show password
         if (tbShowHidePassword.isChecked()) {
             tbShowHidePassword.setChecked(true);
@@ -138,9 +140,12 @@ public class FLogIn extends Fragment implements View.OnClickListener {
             tbShowHidePassword.setBackgroundResource(R.drawable.ic_show_password);
             etPassword.setTransformationMethod(new PasswordTransformationMethod());
         }
+        //move pointer at end of password
+        etPassword.setSelection(etPassword.length());
     }
 
     private void logIn() {
+
         sEmail = etEmail.getText().toString().trim().toLowerCase();
         sPassword = etPassword.getText().toString().trim();
 
@@ -152,7 +157,7 @@ public class FLogIn extends Fragment implements View.OnClickListener {
             return;
         }
 
-        logInUserToFireBase();
+        logInHallToFireBase();
     }
 
     private boolean allValidation() {
@@ -183,12 +188,14 @@ public class FLogIn extends Fragment implements View.OnClickListener {
         return true;
     }
 
-    private void logInUserToFireBase() {
+    private void logInHallToFireBase() {
 
         progressDialog.setMessage("Login...");
         progressDialog.show();
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
+
+        //check email belongs to Hall or Marquee not to User
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mAuth.signInWithEmailAndPassword(sEmail, sPassword)

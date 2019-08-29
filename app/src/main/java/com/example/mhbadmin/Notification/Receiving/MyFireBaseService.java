@@ -1,12 +1,16 @@
 package com.example.mhbadmin.Notification.Receiving;
 
+import com.example.mhbadmin.Notification.Token;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessagingService;
 
 public class MyFireBaseService extends FirebaseMessagingService {
+
+    private FirebaseDatabase firebaseDatabase = null;
+    private String userId = null;
 
     //instance id service
     @Override
@@ -15,19 +19,18 @@ public class MyFireBaseService extends FirebaseMessagingService {
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
         String newToken = FirebaseInstanceId.getInstance().getToken();
 
         if (firebaseUser != null) {
+            userId = firebaseUser.getUid();
             updateToken(newToken);
         }
     }
 
     private void updateToken(String newToken) {
-        Token token = new Token(newToken);
-
-        FirebaseFirestore.getInstance()
-                .collection("Tokens")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .set(token);
+        Token token1 = new Token(newToken);
+        firebaseDatabase.getReference("Tokens").child(userId).setValue(token1);
     }
 }

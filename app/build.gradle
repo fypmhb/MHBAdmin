@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
+    buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.example.mhbadmin"
         minSdkVersion 19
@@ -29,15 +29,15 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     //FireBase
-    implementation 'com.google.firebase:firebase-auth:18.1.0'
-    implementation 'com.google.firebase:firebase-storage:18.1.1'
-    implementation 'com.google.firebase:firebase-firestore:20.2.0'
+    implementation 'com.google.firebase:firebase-auth:19.0.0'
+    implementation 'com.google.firebase:firebase-storage:19.0.0'
+    implementation 'com.google.firebase:firebase-database:19.0.0'
 
     //For notification
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     //FireBase notification
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
     //FireBase Ended
 
     //for object put in a sharedPreference
@@ -67,9 +67,30 @@ dependencies {
     implementation 'com.github.santalu:mask-edittext:1.0.2'
 
     //recyclerView
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta01'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta03'
 
     //for setting activity
     implementation 'androidx.preference:preference:1.1.0-rc01'
+
+    //SQLite library Room
+    def room_version = "2.2.0-beta01"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+//    implementation 'com.github.p32929:AndroidEasySQL-Library:1.4.0'
+/*
+
+    //Detect current location
+    implementation 'com.github.DMGDesignUK:DmgLocationUtils:v1.0.1'
+*/
+
+    //custom navigation drawer
+    implementation 'com.github.RupinSahu:CardDrawer:-SNAPSHOT'
+
+    //swipe to refresh Recycler View
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+
+    //get color of image
+    implementation 'androidx.palette:palette:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

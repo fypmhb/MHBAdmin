@@ -31,19 +31,21 @@ public class ImageSwipeAdapter extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return view == object;
     }
 
-
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
 
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         assert layoutInflater != null;
         View item_view = layoutInflater.inflate(R.layout.swipe_layout, container, false);
+
         ImageView imageView = item_view.findViewById(R.id.iv_swipe_image_view);
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+
         Glide.with(context).load(image_resources.get(position)).into(imageView);
         container.addView(item_view);
         return item_view;

@@ -5,7 +5,7 @@
     android:id="@+id/request_booking_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.RequestBookingListActivity">
+    tools:context=".Activities.FragmentRelated.RequestBookingListActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"

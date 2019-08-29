@@ -31,8 +31,8 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"
-            android:text="Select minimum 5 hall entrance images" />
+            android:text="Select minimum 5 hall entrance images"
+            android:textSize="@dimen/_20ssp" />
 
         <RelativeLayout
             android:id="@+id/rl_select_images"
@@ -74,15 +74,15 @@
                 android:layout_marginStart="@dimen/_30sdp"
                 android:checked="true"
                 android:text="Hall"
-                android:textSize="@dimen/_20ssp"/>
+                android:textSize="@dimen/_20ssp" />
 
             <RadioButton
                 android:id="@+id/rb_marquee"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_30sdp"
-                android:textSize="@dimen/_20ssp"
-                android:text="Marquee" />
+                android:text="Marquee"
+                android:textSize="@dimen/_20ssp" />
         </RadioGroup>
 
         <EditText
@@ -90,16 +90,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/rg_hall_marquee"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="  Hall Name"
             android:imeOptions="actionNext"
             android:inputType="textPersonName"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_manager_profile"
@@ -131,71 +132,75 @@
             android:layout_marginStart="@dimen/_30sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"
-            android:text="Manager Name" />
+            android:text="Manager Name"
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_first_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_manager_name"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:layout_toStartOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="First Name"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_last_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_first_name"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:layout_toLeftOf="@id/iv_manager_profile"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:hint="Last Name"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_hall_marquee_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_last_name"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_email"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Email"
             android:imeOptions="actionNext"
             android:inputType="textEmailAddress"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <com.santalu.maskedittext.MaskEditText
             android:id="@+id/met_hall_marquee_phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_hall_marquee_email"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableStart="@drawable/ic_local_phone"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Phone No"
@@ -203,79 +208,83 @@
             android:inputType="phone"
             android:padding="@dimen/_5sdp"
             android:textSize="@dimen/_20ssp"
-            app:met_mask="+92###########" />
+            app:met_mask="+92##########" />
 
         <EditText
             android:id="@+id/et_hall_marquee_city"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/met_hall_marquee_phone_no"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_location_city"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall City"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_hall_marquee_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_hall_marquee_city"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_location_pin"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Hall Location"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_hall_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_hall_marquee_location"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableLeft="@drawable/ic_vpn_key"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Password"
             android:imeOptions="actionNext"
             android:inputType="textPassword"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <EditText
             android:id="@+id/et_hall_confirm_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_hall_password"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_white"
+            android:backgroundTint="#E9D0D0"
             android:drawableStart="@drawable/ic_vpn_key"
             android:drawablePadding="@dimen/_5sdp"
             android:hint="  Confirm Password"
             android:imeOptions="actionNext"
             android:inputType="textPassword"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"/>
+            android:textSize="@dimen/_20ssp" />
 
         <TextView
             android:id="@+id/tv_other_facilities"
@@ -286,8 +295,8 @@
             android:layout_marginStart="@dimen/_30sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"
-            android:text="Other Facilities" />
+            android:text="Other Facilities"
+            android:textSize="@dimen/_20ssp" />
 
         <LinearLayout
             android:id="@+id/ll_chicken_music"
@@ -303,19 +312,19 @@
                 android:id="@+id/cb_chicken"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="@dimen/_20sdp"
+                android:layout_weight="1"
                 android:text="Spotlights"
-                android:textSize="@dimen/_15ssp"/>
+                android:textSize="@dimen/_15ssp" />
 
             <CheckBox
                 android:id="@+id/cb_music"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="@dimen/_20sdp"
+                android:layout_weight="1"
                 android:text="Music"
-                android:textSize="@dimen/_15ssp"/>
+                android:textSize="@dimen/_15ssp" />
         </LinearLayout>
 
         <LinearLayout
@@ -332,19 +341,19 @@
                 android:id="@+id/cb_ac_heater"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="@dimen/_20sdp"
+                android:layout_weight="1"
                 android:text="AC/Heater"
-                android:textSize="@dimen/_15ssp"/>
+                android:textSize="@dimen/_15ssp" />
 
             <CheckBox
                 android:id="@+id/cb_parking"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="@dimen/_20sdp"
+                android:layout_weight="1"
                 android:text="Parking"
-                android:textSize="@dimen/_15ssp"/>
+                android:textSize="@dimen/_15ssp" />
         </LinearLayout>
 
         <Button
@@ -352,8 +361,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/ll_ac_heater_parking"
-            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginStart="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginEnd="@dimen/_30sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/round_green"
@@ -361,8 +370,8 @@
             android:imeOptions="actionDone"
             android:padding="@dimen/_5sdp"
             android:text="Sign UP"
-            android:textSize="@dimen/_20ssp"
-            android:textColor="#fff" />
+            android:textColor="#fff"
+            android:textSize="@dimen/_20ssp" />
 
         <TextView
             android:id="@+id/tv_already_have_one"
@@ -373,9 +382,9 @@
             android:layout_margin="@dimen/_10sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:textSize="@dimen/_20ssp"
             android:text="Already Have One!"
             android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/_20ssp"
             android:textStyle="italic|bold" />
 
     </RelativeLayout>

@@ -24,7 +24,8 @@ import com.example.mhbadmin.AdapterClasses.SelectImagesAdapter;
 import com.example.mhbadmin.Classes.CCustomToast;
 import com.example.mhbadmin.Classes.CGetImageName;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.CUploadSubHallDataToFireBase;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
+import com.example.mhbadmin.Classes.Upload.CUploadSubHallData;
 import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -193,6 +194,9 @@ public class AddSubHallActivity extends AppCompatActivity implements View.OnClic
         } else if (v.getId() == R.id.iv_upload_image) {
             intentForOpenGallery();
         } else if (v.getId() == R.id.btn_add_more) {
+//            No need to assign
+//            intentFlag = true;
+//            because it is already initialised with false.
             uploadDataToFireBaseAndIntent();
         } else if (v.getId() == R.id.btn_done) {
             intentFlag = true;
@@ -228,12 +232,22 @@ public class AddSubHallActivity extends AppCompatActivity implements View.OnClic
 
         //FireBase work
 
+        CSubHallData cSubHallData = null;
+
+        if (!sSubHallFloorNo.equals("0")) {
+            cSubHallData = new CSubHallData(sSubHallName, sSubHallFloorNo, sSubHallCapacity, sChickenRate,
+                    sMuttonRate, sBeefRate, srbSweetDish, srbSalad, srbDrink, srbNan, srbRise,
+                    sLGetAddHallImagesDownloadUri);
+        } else {
+            cSubHallData = new CSubHallData(sSubHallName, sSubHallCapacity, sChickenRate, sMuttonRate, sBeefRate,
+                    srbSweetDish, srbSalad, srbDrink, srbNan, srbRise, sLGetAddHallImagesDownloadUri);
+        }
+
         //this int is used to check whether this class
-        //is instantiated from addSubHallActivity (=0) or FUpdateSubHAllInfo (=noOfTabs).
-        new CUploadSubHallDataToFireBase(this, intentFlag, 0, sSubHallName,
-                sSubHallFloorNo, sSubHallCapacity, sChickenRate, sMuttonRate, sBeefRate,
-                srbSweetDish, srbSalad, srbDrink, srbNan, srbRise, userId, sLAddHallImagesUri,
-                sLAddHallImageNames, sLGetAddHallImagesDownloadUri, sHallMarquee);
+        //is instantiated from addSubHallActivity (=0) or FUpdateSubHAllInfo (=noOfTabs)
+        //{but =0 is not "Sub Hall Counter}.
+        new CUploadSubHallData(this, cSubHallData, intentFlag, 0,
+                null, userId, sLAddHallImagesUri, sLAddHallImageNames, sHallMarquee);
     }
 
     private void getDataFromView() {

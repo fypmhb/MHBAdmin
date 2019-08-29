@@ -8,9 +8,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/_5sdp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_user_profile"
             android:layout_width="@dimen/_120sdp"
             android:layout_height="match_parent"
@@ -19,7 +20,7 @@
 
         <TextView
             android:id="@+id/tv_user_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_5sdp"
             android:layout_marginTop="@dimen/_5sdp"
@@ -30,7 +31,7 @@
 
         <TextView
             android:id="@+id/tv_user_phone_no"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_user_name"
             android:layout_marginStart="@dimen/_5sdp"
@@ -41,8 +42,8 @@
             android:textSize="@dimen/_10ssp" />
 
         <TextView
-            android:id="@+id/tv_request_booking_time_date"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_booking_request_cancel_accept_time_date"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_user_phone_no"
             android:layout_marginStart="@dimen/_5sdp"
@@ -52,13 +53,26 @@
             android:padding="@dimen/_2sdp"
             android:textSize="@dimen/_10ssp" />
 
+        <TextView
+            android:id="@+id/tv_user_location"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tv_booking_request_cancel_accept_time_date"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/iv_user_profile"
+            android:hint="02:09 PM 22\3\18"
+            android:maxLines="2"
+            android:padding="@dimen/_2sdp"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_request_booking_time_date"
+            android:layout_below="@id/tv_booking_request_cancel_accept_time_date"
             android:layout_marginStart="@dimen/_5sdp"
             android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toEndOf="@id/iv_user_profile"
             android:orientation="horizontal"
             android:padding="@dimen/_2sdp"
