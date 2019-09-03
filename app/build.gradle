@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+//SQLite Abstract layer
+apply plugin: 'io.objectbox' // apply last
 
 android {
     compileSdkVersion 29
@@ -72,17 +74,8 @@ dependencies {
     //for setting activity
     implementation 'androidx.preference:preference:1.1.0-rc01'
 
-    //SQLite library Room
-    def room_version = "2.2.0-beta01"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-
-//    implementation 'com.github.p32929:AndroidEasySQL-Library:1.4.0'
-/*
-
     //Detect current location
-    implementation 'com.github.DMGDesignUK:DmgLocationUtils:v1.0.1'
-*/
+//    implementation 'com.github.DMGDesignUK:DmgLocationUtils:v1.0.1'
 
     //custom navigation drawer
     implementation 'com.github.RupinSahu:CardDrawer:-SNAPSHOT'
@@ -92,5 +85,10 @@ dependencies {
 
     //get color of image
     implementation 'androidx.palette:palette:1.0.0'
+
+    //Notification Badge
+//    implementation 'com.github.arturogutierrez:badges:1.0.5@aar'
+
+    implementation "me.leolin:ShortcutBadger:1.1.22@aar"
 }
 apply plugin: 'com.google.gms.google-services'

@@ -2,7 +2,9 @@ package com.example.mhbadmin.Filters;
 
 import android.widget.Filter;
 
-import com.example.mhbadmin.AdapterClasses.RequestBookingAdapter;
+import com.example.mhbadmin.AdapterClasses.RequestBookingHistoryAdapter;
+import com.example.mhbadmin.Classes.Models.CRequestBookingData;
+import com.example.mhbadmin.Classes.Models.CUserData;
 import com.example.mhbadmin.Classes.Models.FilterLists;
 
 import java.util.ArrayList;
@@ -12,17 +14,21 @@ public class RequestBookingFilter extends Filter {
 
     private List<FilterLists> filterLists = null;
 
-    private RequestBookingAdapter requestBookingAdapter = null;
+    private RequestBookingHistoryAdapter requestBookingHistoryAdapter = null;
 
-    public RequestBookingFilter(List<FilterLists> filterLists, RequestBookingAdapter requestBookingAdapter) {
+    public RequestBookingFilter(List<FilterLists> filterLists, RequestBookingHistoryAdapter requestBookingHistoryAdapter) {
         this.filterLists = filterLists;
-        this.requestBookingAdapter = requestBookingAdapter;
+        this.requestBookingHistoryAdapter = requestBookingHistoryAdapter;
     }
 
     //Filtering Occurs
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
         FilterResults results = new FilterResults();
+        FilterLists filterLists1=null;
+        CRequestBookingData cRequestBookingData=null;
+        CUserData cUserData=null;
+
         //CHECK CONSTRAINT VALIDITY
         if (constraint != null && constraint.length() > 0) {
             //CHANGE TO UPPER
@@ -31,17 +37,23 @@ public class RequestBookingFilter extends Filter {
             //STORE OUR FILTERED PLAYERS
             ArrayList<FilterLists> filteredPlayers = new ArrayList<>();
             for (int i = 0; i < filterLists.size(); i++) {
+
+                filterLists1=filterLists.get(i);
+
+                cRequestBookingData=filterLists1.getcRequestBookingDataList();
+                cUserData=filterLists1.getcUserDataList();
+
                 //CHECK
-                if (filterLists.get(i).getsCity().toLowerCase().contains(constraint) ||
-                        filterLists.get(i).getsLocation().toLowerCase().contains(constraint) ||
-                        filterLists.get(i).getsUserFirstName().toLowerCase().contains(constraint) ||
-                        filterLists.get(i).getsUserLastName().toLowerCase().contains(constraint) ||
-                        filterLists.get(i).getsFunctionDate().contains(constraint) ||
-                        filterLists.get(i).getsFunctionTiming().toLowerCase().contains(constraint) ||
-                        filterLists.get(i).getsEstimatedBudget().contains(constraint) ||
-                        filterLists.get(i).getsNoOfGuests().contains(constraint) ||
-                        filterLists.get(i).getsRequestTime().contains(constraint) ||
-                        filterLists.get(i).getsOtherDetail().toLowerCase().contains(constraint)) {
+                if (cUserData.getsCity().toLowerCase().contains(constraint) ||
+                        cUserData.getsLocation().toLowerCase().contains(constraint) ||
+                        cUserData.getsUserFirstName().toLowerCase().contains(constraint) ||
+                        cUserData.getsUserLastName().toLowerCase().contains(constraint) ||
+                        cRequestBookingData.getsFunctionDate().contains(constraint) ||
+                        cRequestBookingData.getsFunctionTiming().toLowerCase().contains(constraint) ||
+                        cRequestBookingData.getsEstimatedBudget().contains(constraint) ||
+                        cRequestBookingData.getsNoOfGuests().contains(constraint) ||
+                        cRequestBookingData.getsRequestTime().contains(constraint) ||
+                        cRequestBookingData.getsOtherDetail().toLowerCase().contains(constraint)) {
                     //ADD PLAYER TO FILTERED PLAYERS
                     filteredPlayers.add(filterLists.get(i));
                 }
@@ -57,8 +69,8 @@ public class RequestBookingFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
-        requestBookingAdapter.filterLists = (List<FilterLists>) results.values;
+        requestBookingHistoryAdapter.filterLists = (List<FilterLists>) results.values;
         //REFRESH
-        requestBookingAdapter.notifyDataSetChanged();
+        requestBookingHistoryAdapter.notifyDataSetChanged();
     }
 }

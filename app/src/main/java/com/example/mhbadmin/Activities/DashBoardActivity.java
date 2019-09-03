@@ -25,17 +25,18 @@ import androidx.viewpager.widget.ViewPager;
 import com.bumptech.glide.Glide;
 import com.example.mhbadmin.Activities.FragmentRelated.HistoryActivity;
 import com.example.mhbadmin.Activities.FragmentRelated.RequestBookingListActivity;
-import com.example.mhbadmin.Activities.FragmentRelated.SubHallMarqueeDetailActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.ShowDeleteSubHallActivity;
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
-import com.example.mhbadmin.Classes.AbstractClasses.BookingsDataBase;
+import com.example.mhbadmin.BroadcastReceiver.BNotification;
 import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Classes.Models.CSignUpData;
 import com.example.mhbadmin.Classes.Models.CSubHallData;
 import com.example.mhbadmin.Classes.Models.CUserData;
+import com.example.mhbadmin.Classes.Models.ObjectBox.DBBookings;
+import com.example.mhbadmin.Classes.Models.ObjectBox.DBObjectBox;
 import com.example.mhbadmin.Notification.Token;
 import com.example.mhbadmin.R;
-import com.example.mhbadmin.Service.SNotification;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -50,8 +51,14 @@ import com.rupins.drawercardbehaviour.CardDrawerLayout;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.objectbox.Box;
+
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public static final String S_SUB_HALL_DOCUMENT_ID = "S_SUB_HALL_DOCUMENT_ID";
+    public static final String S_SUB_HALL_OBJECT = "S_SUB_HALL_OBJECT";
+    public static final String REQUEST_BADGES = "REQUEST_BADGES";
+    public static final String BOOKING_BADGE = "BOOKING_BADGE";
 
     private Toolbar toolbar = null;
     private CardDrawerLayout drawer = null;
@@ -86,8 +93,8 @@ public class DashBoardActivity extends AppCompatActivity
 
     private CSignUpData cSignUpData = null;
 
-    //offline DataBase
-    BookingsDataBase db = null;
+    //offLine dataBase
+    Box<DBBookings> bookingsBox = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +105,7 @@ public class DashBoardActivity extends AppCompatActivity
 
         connectivity();
 
-        startService(new Intent(getApplicationContext(), SNotification.class));
+        startService(new Intent(getApplicationContext(), BNotification.class));
 
         setSupportActionBar(toolbar);
 
@@ -116,6 +123,11 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
     private void connectivity() {
+
+
+//      offLine dataBase
+        bookingsBox = DBObjectBox.getBoxStore().boxFor(DBBookings.class);
+        bookingsBox.removeAll();
 
         //FireBase work
 
@@ -143,9 +155,6 @@ public class DashBoardActivity extends AppCompatActivity
 
         tvNavigationDashBoardHallMarqueeName = (TextView) headerView.findViewById(R.id.tv_navigation_dash_board_hall_marquee_name);
 
-        //offline Database
-
-        db = BookingsDataBase.getInstance(this);
     }
 
     private void fireBaseWork() {
@@ -161,8 +170,6 @@ public class DashBoardActivity extends AppCompatActivity
         //for offline notification
         getBookingsDataFromFireBase();
 
-        //FireBase Work
-        checkFireBaseState();
     }
 
     private boolean checkInternetConnection() {
@@ -251,34 +258,26 @@ public class DashBoardActivity extends AppCompatActivity
 
                                                                                                 CRequestBookingData cRequestBookingData = dataSnapshot.getValue(CRequestBookingData.class);
 
-                                                                                                assert cRequestBookingData != null;
-                                                                                                String sFunctionDate = cRequestBookingData.getsFunctionDate();
-
-                                                                                                int beforeFunctionDay = 0;
-                                                                                                if (sFunctionDate.charAt(1) != '-')
-                                                                                                    beforeFunctionDay = Integer.parseInt(sFunctionDate.substring(0, 2)) - 1;
-                                                                                                else
-                                                                                                    beforeFunctionDay = Integer.parseInt(sFunctionDate.substring(0, 1));
-
-
                                                                                                 assert cUserData != null;
                                                                                                 cUserData.setsUserID(sClient);
-                                                                                                cUserData.setsSubHallId(sSubHallId);
+
+                                                                                                assert cRequestBookingData != null;
                                                                                                 cRequestBookingData.setsAcceptDeniedTiming(sTiming);
 
-                                                                                                //save data to SQLite Room
+                                                                                                String sFunctionDate = cRequestBookingData.getsFunctionDate();
 
-                                                                                                Gson gson=new Gson();
+                                                                                                //save data to SQLite ObjectBox
+                                                                                                Gson gson = new Gson();
 
-                                                                                                /*DBBookings dbBookings = new DBBookings(gson.toJson(cUserData), gson.toJson(cRequestBookingData), cRequestBookingData.getsFunctionDate());
-                                                                                                db.dbBookingsDao().insertAll(dbBookings);*/
+                                                                                                String sUserData = gson.toJson(cUserData);
+                                                                                                String sRequestBookingData = gson.toJson(cRequestBookingData);
 
-                                                                                               /* DateFormat dateFormat = new SimpleDateFormat("dd-M-yyyy");
+                                                                                                DBBookings dbBookings = new DBBookings(sUserData, sRequestBookingData, sFunctionDate);
 
-                                                                                                String sDate = dateFormat.format(new Date());
+                                                                                                bookingsBox.put(dbBookings);
 
-                                                                                                List<DBBookings> dbBookingsList = db.dbBookingsDao().loadAllByFunctionDates(sDate);
-                                                                                                */
+                                                                                                progressDialog.dismiss();
+                                                                                                checkFireBaseState();
                                                                                             }
                                                                                         }
 
@@ -298,6 +297,10 @@ public class DashBoardActivity extends AppCompatActivity
                                                             });
 
                                                         }
+                                                    } else {
+                                                        //FireBase Work
+                                                        progressDialog.dismiss();
+                                                        checkFireBaseState();
                                                     }
                                                 }
 
@@ -315,6 +318,9 @@ public class DashBoardActivity extends AppCompatActivity
                                     }
                                 });
                     }
+                } else {//FireBase Work
+                    progressDialog.dismiss();
+                    checkFireBaseState();
                 }
             }
 
@@ -430,6 +436,7 @@ public class DashBoardActivity extends AppCompatActivity
                             editor.commit();
 
                             final int finalI = i;
+                            assert sSubHallDocumentId != null;
                             databaseReference.child(sSubHallDocumentId)
                                     .addValueEventListener(new ValueEventListener() {
                                         @Override
@@ -537,17 +544,20 @@ public class DashBoardActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_hall_detail) {
             navigationFlag = false;
-            startActivity(new Intent(getApplicationContext(), SubHallMarqueeDetailActivity.class));
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("sDeleteShowSubHall", "show");
+            editor.commit();
+            startActivity(new Intent(getApplicationContext(), ShowDeleteSubHallActivity.class));
         } else if (id == R.id.nav_requests) {
             navigationFlag = false;
             SharedPreferences.Editor editor = sp.edit();
-            editor.putString("Request Booking", "Booking Requests");
+            editor.putString("sRequestBookingHistory", "Booking Requests");
             editor.commit();
             startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
         } else if (id == R.id.nav_bookings) {
             navigationFlag = false;
             SharedPreferences.Editor editor = sp.edit();
-            editor.putString("Request Booking", "Accepted Requests");
+            editor.putString("sRequestBookingHistory", "Accepted Requests");
             editor.commit();
             startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
         } else if (id == R.id.nav_history) {
@@ -583,6 +593,9 @@ public class DashBoardActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = sp.edit();
                 editor.clear();
                 editor.commit();
+
+                //removing data from objectBox
+                bookingsBox.removeAll();
                 startActivity(new Intent(getApplicationContext(), SplashScreenActivity.class));
                 finish();
             }
@@ -604,6 +617,12 @@ public class DashBoardActivity extends AppCompatActivity
         builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.clear();
+                editor.commit();
+
+                //removing data from objectBox
+                bookingsBox.removeAll();
                 finish();
             }
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {

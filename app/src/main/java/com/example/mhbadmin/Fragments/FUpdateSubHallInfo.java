@@ -40,8 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
+import static com.example.mhbadmin.Activities.DashBoardActivity.S_SUB_HALL_DOCUMENT_ID;
 import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_REQUEST_CODE;
-import static com.example.mhbadmin.Fragments.FSubHallMarqueeDetail.S_SUB_HALL_DOCUMENT_ID;
 import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
 public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener {

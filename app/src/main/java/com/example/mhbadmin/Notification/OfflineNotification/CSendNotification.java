@@ -5,19 +5,23 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.example.mhbadmin.Activities.RequestBookingDetailActivity;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Classes.Models.CUserData;
 import com.example.mhbadmin.R;
 import com.google.gson.Gson;
+
+import me.leolin.shortcutbadger.ShortcutBadger;
+
+import static com.example.mhbadmin.Activities.DashBoardActivity.BOOKING_BADGE;
 
 public class CSendNotification {
 
@@ -27,13 +31,18 @@ public class CSendNotification {
 
     private CRequestBookingData cRequestBookingData = null;
 
+    private SharedPreferences sp = null;
+
+
     public CSendNotification(Context context, CUserData cUserData, CRequestBookingData cRequestBookingData) {
         this.context = context;
         this.cUserData = cUserData;
         this.cRequestBookingData = cRequestBookingData;
+
+        this.sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
     }
 
-    public void sendNotification() {
+    public void sendNotification(int j) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
@@ -45,10 +54,10 @@ public class CSendNotification {
         String sCRequestBookingData = gson.toJson(cRequestBookingData);
 
         String title = cUserData.getsUserFirstName() + " " + cUserData.getsUserLastName();
-        String body = "At " + cRequestBookingData.getsFunctionDate() + " a function will be held";
-        String userId = cUserData.getsUserID();
 
-        int j = Integer.parseInt(userId.replaceAll("[\\D]", ""));
+        String body = "Today at " + cRequestBookingData.getsFunctionDate() + " " +
+                cRequestBookingData.getsFunctionTiming() + " a function will be held";
+
         Intent intent = new Intent(context, RequestBookingDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("sActivityName", "Accepted Requests");
@@ -61,23 +70,50 @@ public class CSendNotification {
 
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "1")
                 .setSmallIcon(R.drawable.ic_add_picture_)
                 .setContentTitle(title)
-                .setContentText(body)
                 .setAutoCancel(true)
                 .setSound(defaultSound)
+                .setStyle(inboxStyle)
+                .setStyle(inboxStyle.addLine(body))
                 .setContentIntent(pendingIntent);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-
-        int i = 0;
-
-        if (j > 0) {
-            i = j;
+        //Notification Badge
+        if (sp.getInt(BOOKING_BADGE, 0) != 0) {
+            int badge = sp.getInt(BOOKING_BADGE, 0);
+            badge += 1;
+            createBadge(badge);
+        } else {
+            createBadge(1);
         }
-        notificationManager.notify(i, builder.build());
+
+        assert notificationManager != null;
+        notificationManager.notify(j, builder.build());
+    }
+
+    private void createBadge(int badge) {
+
+        ShortcutBadger.applyCount(context, badge);
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(BOOKING_BADGE, badge);
+        editor.commit();
+
+        /*try {
+            Badges.setBadge(context, badge);
+
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt(BOOKING_BADGE, badge);
+            editor.commit();
+        } catch (BadgesNotSupportedException b) {
+            Toast.makeText(context, "CSendNotification sorry", Toast.LENGTH_SHORT).show();
+            b.printStackTrace();
+        }*/
     }
 
     private void createNotificationChannel() {

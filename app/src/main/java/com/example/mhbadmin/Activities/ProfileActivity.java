@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.mhbadmin.Activities.FragmentRelated.DeleteSubHallActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.ShowDeleteSubHallActivity;
 import com.example.mhbadmin.Activities.FragmentRelated.UpdateSubHallInfoActivity;
 import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.Delete.CDeleteEntireHall;
@@ -103,7 +104,11 @@ public class ProfileActivity extends AppCompatActivity {
             pDeleteSubHall.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    startActivity(new Intent(context, DeleteSubHallActivity.class));
+                    SharedPreferences sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("sDeleteShowSubHall", "delete");
+                    editor.commit();
+                    startActivity(new Intent(context, ShowDeleteSubHallActivity.class));
                     return false;
                 }
             });

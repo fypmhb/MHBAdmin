@@ -104,7 +104,7 @@
             android:layout_marginStart="@dimen/_10sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:text="Curry:" />
+            android:text="Dishes:" />
 
 
         <LinearLayout

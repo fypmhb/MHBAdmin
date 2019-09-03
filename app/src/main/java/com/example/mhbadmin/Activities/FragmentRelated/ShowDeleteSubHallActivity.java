@@ -13,14 +13,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.mhbadmin.Fragments.FSubHallMarqueeDetail;
+import com.example.mhbadmin.Fragments.FShowDeleteSubHall;
 import com.example.mhbadmin.R;
-
 import com.google.android.material.tabs.TabLayout;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.SUB_HALL_COUNTER;
 
-public class SubHallMarqueeDetailActivity extends AppCompatActivity {
+public class ShowDeleteSubHallActivity extends AppCompatActivity {
 
     private TabLayout tabLayout = null;
     private ViewPager tabsViewPager = null;
@@ -31,11 +30,10 @@ public class SubHallMarqueeDetailActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sub_hall_marquee_detail);
+        setContentView(R.layout.activity_show_delete_sub_hall);
 
         connectivity();
 
@@ -50,8 +48,7 @@ public class SubHallMarqueeDetailActivity extends AppCompatActivity {
 
         tabsViewPager = findViewById(R.id.tabs_view_pager);
 
-        tabLayout = findViewById(R.id.tl_hall_marquee_detail);
-
+        tabLayout = findViewById(R.id.tl_delete_sub_hall);
     }
 
     private void checkFireBaseState() {
@@ -68,27 +65,26 @@ public class SubHallMarqueeDetailActivity extends AppCompatActivity {
 
         if (sp.getInt(SUB_HALL_COUNTER, 0) != 0) {
             int noOfTabs = sp.getInt(SUB_HALL_COUNTER, 0);
-            setActivityHallMarqueeDetail(noOfTabs);
-        }
-        else {
+            setActivityDeleteSubHall(noOfTabs);
+        } else {
             Toast.makeText(this, "Please add sub hall", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         }
     }
 
-    private void setActivityHallMarqueeDetail(int noOfTabs) {
+    private void setActivityDeleteSubHall(int noOfTabs) {
 
         progressDialog.dismiss();
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), noOfTabs);
+        ShowDeleteSubHallActivity.ViewPagerAdapter viewPagerAdapter = new ShowDeleteSubHallActivity.ViewPagerAdapter(getSupportFragmentManager(), noOfTabs);
         tabsViewPager.setAdapter(viewPagerAdapter);
-        tabLayout.setupWithViewPager(tabsViewPager);
+        tabLayout.setupWithViewPager(tabsViewPager, true);
     }
 
     //Fragment Replacement Class
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
-        private int noOfItems = 0;
 
+        private int noOfItems = 0;
 
         ViewPagerAdapter(FragmentManager fm, int noOfItems) {
             super(fm);
@@ -98,7 +94,10 @@ public class SubHallMarqueeDetailActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return FSubHallMarqueeDetail.newInstance(sp.getString("sSubHallObject" + (position + 1), null));
+                return FShowDeleteSubHall
+                        .newInstance(sp.getString("sSubHallDocumentId" + (position + 1), null),
+                                sp.getString("sSubHallObjectId" + (position + 1), null),
+                                sp.getString("sSubHallObject" + (position + 1), null));
         }
 
         @Override

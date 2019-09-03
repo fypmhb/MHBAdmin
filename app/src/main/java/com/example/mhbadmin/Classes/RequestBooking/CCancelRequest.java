@@ -23,10 +23,8 @@ public class CCancelRequest {
     private boolean listActivityFlag = false;
 
     private String sUserId = null,
-            sCancellationTiming = null,
             sHallId = null,
-            sHallMarquee = null,
-            sSubHallId = null;
+            sHallMarquee = null;
 
     private CRequestBookingData cRequestBookingData = null;
 
@@ -36,12 +34,11 @@ public class CCancelRequest {
 
     private SharedPreferences sp = null;
 
-    public CCancelRequest(Context context, boolean listActivityFlag, String sUserId, String sSubHallId, CRequestBookingData cRequestBookingData) {
+    public CCancelRequest(Context context, boolean listActivityFlag, String sUserId, CRequestBookingData cRequestBookingData) {
 
         this.context = context;
         this.listActivityFlag = listActivityFlag;
         this.sUserId = sUserId;
-        this.sSubHallId = sSubHallId;
         this.cRequestBookingData = cRequestBookingData;
 
         connectivity();
@@ -50,8 +47,6 @@ public class CCancelRequest {
     }
 
     private void connectivity() {
-
-        sCancellationTiming = Calendar.getInstance().getTime().toString();
 
         sHallId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -87,7 +82,8 @@ public class CCancelRequest {
                 .child(sHallMarquee + " Ids")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Sub Hall Ids")
-                .child(sSubHallId)
+                .child(cRequestBookingData.getsSubHallId())
+                .child("Timing")
                 .child(cRequestBookingData.getsFunctionDate() + " " + cRequestBookingData.getsFunctionTiming())
                 .removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -99,13 +95,17 @@ public class CCancelRequest {
     }
 
     private void addCanceledRequestsDetail() {
+
+        String sCancellationTiming = Calendar.getInstance().getTime().toString();
+        cRequestBookingData.setsAcceptDeniedTiming(sCancellationTiming);
+
         firebaseDatabase.getReference("Canceled Requests")
                 .child("User Ids")
                 .child(sUserId)
                 .child(sHallMarquee + " Ids")
                 .child(sHallId)
                 .child("Sub Hall Ids")
-                .child(sSubHallId)
+                .child(cRequestBookingData.getsSubHallId())
                 .child("Timing")
                 .child(sCancellationTiming)
                 .setValue(cRequestBookingData)
@@ -120,7 +120,7 @@ public class CCancelRequest {
     private void intentToNextActivity() {
 
         if (listActivityFlag) {
-            ((Activity)context).recreate();
+            ((Activity) context).recreate();
             progressDialog.dismiss();
         } else {
             context.startActivity(new Intent(context, DashBoardActivity.class));

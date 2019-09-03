@@ -1,6 +1,8 @@
 package com.example.mhbadmin.Fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -8,9 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
@@ -18,25 +22,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.mhbadmin.AdapterClasses.RequestBookingAdapter;
+import com.example.mhbadmin.AdapterClasses.RequestBookingHistoryAdapter;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.GetData.CGetRequestBookingData;
+import com.example.mhbadmin.Classes.GetData.CGetRequestBookingHistoryData;
 import com.example.mhbadmin.Classes.Models.FilterLists;
 import com.example.mhbadmin.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FDenied extends Fragment {
+@RequiresApi(api = Build.VERSION_CODES.M)
+public class FHistory extends Fragment implements View.OnClickListener, RecyclerView.OnScrollChangeListener {
 
     private View fragmentView = null;
     private Context context = null;
 
+    private String sFragmentName = null;
+
     private SwipeRefreshLayout mySwipeRefreshLayout = null;
 
+    private RecyclerView rvHistory = null;
     private List<FilterLists> filterLists = null;
 
-    private RequestBookingAdapter requestBookingAdapter = null;
+    private Button btnReturnToTop = null;
+
+    private RequestBookingHistoryAdapter requestBookingHistoryAdapter = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,9 +55,15 @@ public class FDenied extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-        fragmentView = inflater.inflate(R.layout.fragment_denied, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_history, container, false);
 
         connectivity();
+
+
+        SharedPreferences sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
+
+        if (sp.getString("sRequestBookingHistory", null) != null)
+            sFragmentName = sp.getString("sRequestBookingHistory", null);
 
         getDataFromFireBase();
 
@@ -59,7 +75,7 @@ public class FDenied extends Fragment {
                         // The method calls setRefreshing(false) when it's finished.
 
                         filterLists.clear();
-                        requestBookingAdapter.notifyDataSetChanged();
+                        requestBookingHistoryAdapter.notifyDataSetChanged();
                         getDataFromFireBase();
                     }
                 });
@@ -69,6 +85,14 @@ public class FDenied extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        //set click and scroll listener
+        btnReturnToTop.setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            rvHistory.setOnScrollChangeListener(this);
+        }
+
+
         return fragmentView;
     }
 
@@ -76,29 +100,35 @@ public class FDenied extends Fragment {
 
         context = getActivity();
 
+        btnReturnToTop = (Button) fragmentView.findViewById(R.id.btn_return_to_top);
+
         mySwipeRefreshLayout = (SwipeRefreshLayout) fragmentView.findViewById(R.id.swipe_refresh);
+
+        rvHistory = (RecyclerView) fragmentView.findViewById(R.id.rv_hall_marquee_success);
 
         filterLists = new ArrayList<>();
 
-        RecyclerView rvDenied = (RecyclerView) fragmentView.findViewById(R.id.rv_hall_marquee_denied);
-
-        requestBookingAdapter = new RequestBookingAdapter(context, "Denied Bookings", filterLists);
+        requestBookingHistoryAdapter = new RequestBookingHistoryAdapter(context, "History", filterLists);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
 
-        rvDenied.setLayoutManager(mLayoutManager);
-        rvDenied.setAdapter(requestBookingAdapter);
+        rvHistory.setLayoutManager(mLayoutManager);
+        rvHistory.setAdapter(requestBookingHistoryAdapter);
     }
 
     private void getDataFromFireBase() {
+
         //check Internet Connection
         if (!checkInternetConnection()) {
             return;
         }
 
-        CGetRequestBookingData cGetRequestBookingData = new CGetRequestBookingData(context, filterLists, requestBookingAdapter, null);
+        CGetRequestBookingHistoryData cGetRequestBookingHistoryData =
+                new CGetRequestBookingHistoryData(context, filterLists, requestBookingHistoryAdapter,
+                        "-LlaNhwyi4fiQHEgW_zb");
 
-        cGetRequestBookingData.getDeniedRequestsData();
+        if (sFragmentName != null)
+            cGetRequestBookingHistoryData.getRequestBookingHistoryData(sFragmentName);
 
         mySwipeRefreshLayout.setRefreshing(false);
     }
@@ -143,9 +173,27 @@ public class FDenied extends Fragment {
     private void getData(CharSequence s) {
         //FILTER AS YOU TYPE
         try {
-            requestBookingAdapter.getFilter().filter(s);
+            requestBookingHistoryAdapter.getFilter().filter(s);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btn_return_to_top) {
+            if (rvHistory != null)
+                rvHistory.smoothScrollToPosition(0);
+        }
+    }
+
+    @Override
+    public void onScrollChange(View view, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+        if (scrollY > oldScrollY)
+            btnReturnToTop.setVisibility(View.VISIBLE);
+        else
+            btnReturnToTop.setVisibility(View.GONE);
     }
 }

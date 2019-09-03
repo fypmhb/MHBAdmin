@@ -4,6 +4,7 @@ public class CRequestBookingData {
 
     private String sRequestTime = null,
             sSubHallName = null,
+            sSubHallId = null,
             sFunctionDate = null,
             sNoOfGuests = null,
             sFunctionTiming = null,
@@ -11,14 +12,15 @@ public class CRequestBookingData {
             sPerHead = null,
             sEstimatedBudget = null,
             sOtherDetail = null,
-    sAcceptDeniedTiming=null;
+            sAcceptDeniedTiming = null;
 
     public CRequestBookingData() {
     }
 
-    public CRequestBookingData(String sRequestTime, String sSubHallName, String sFunctionDate, String sNoOfGuests, String sFunctionTiming, String sDish, String sPerHead, String sEstimatedBudget, String sOtherDetail) {
+    public CRequestBookingData(String sRequestTime, String sSubHallName, String sSubHallId, String sFunctionDate, String sNoOfGuests, String sFunctionTiming, String sDish, String sPerHead, String sEstimatedBudget, String sOtherDetail, String sAcceptDeniedTiming) {
         this.sRequestTime = sRequestTime;
         this.sSubHallName = sSubHallName;
+        this.sSubHallId = sSubHallId;
         this.sFunctionDate = sFunctionDate;
         this.sNoOfGuests = sNoOfGuests;
         this.sFunctionTiming = sFunctionTiming;
@@ -26,6 +28,7 @@ public class CRequestBookingData {
         this.sPerHead = sPerHead;
         this.sEstimatedBudget = sEstimatedBudget;
         this.sOtherDetail = sOtherDetail;
+        this.sAcceptDeniedTiming = sAcceptDeniedTiming;
     }
 
     public String getsRequestTime() {
@@ -42,6 +45,14 @@ public class CRequestBookingData {
 
     public void setsSubHallName(String sSubHallName) {
         this.sSubHallName = sSubHallName;
+    }
+
+    public String getsSubHallId() {
+        return sSubHallId;
+    }
+
+    public void setsSubHallId(String sSubHallId) {
+        this.sSubHallId = sSubHallId;
     }
 
     public String getsFunctionDate() {

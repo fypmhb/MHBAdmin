@@ -118,7 +118,7 @@
             android:layout_marginStart="@dimen/_28sdp"
             android:imeOptions="actionNext"
             android:padding="@dimen/_5sdp"
-            android:text="Curry:"
+            android:text="Dishes:"
             android:textSize="@dimen/_20ssp" />
 
 

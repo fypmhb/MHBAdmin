@@ -34,7 +34,7 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAdapter.MyViewHolder> implements Filterable {
+public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBookingHistoryAdapter.MyViewHolder> implements Filterable {
 
     private Context context = null;
     private String sActivityName = null;
@@ -42,7 +42,7 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
     private RequestBookingFilter requestBookingFilter = null;
 
-    public RequestBookingAdapter(Context context, String sActivityName, List<FilterLists> filterLists) {
+    public RequestBookingHistoryAdapter(Context context, String sActivityName, List<FilterLists> filterLists) {
         this.context = context;
         this.sActivityName = sActivityName;
         this.filterLists = filterLists;
@@ -69,11 +69,14 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
         FilterLists filterLists1 = filterLists.get(position);
 
-        Glide.with(context).load(filterLists1.getsUserProfileImageUri()).into(holder.ivUserProfile);
-        holder.tvUserName.setText(filterLists1.getsUserFirstName() + " " + filterLists1.getsUserLastName());
-        holder.tvPhoneNo.setText(filterLists1.getsPhoneNo());
-        holder.tvRequestTimeDate.setText(filterLists1.getsFunctionTiming()
-                + " " + filterLists1.getsFunctionDate());
+        CUserData cUserData = filterLists1.getcUserDataList();
+        CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
+
+        Glide.with(context).load(cUserData.getsUserProfileImageUri()).into(holder.ivUserProfile);
+        holder.tvUserName.setText(cUserData.getsUserFirstName() + " " + cUserData.getsUserLastName());
+        holder.tvPhoneNo.setText(cUserData.getsPhoneNo());
+        holder.tvRequestTimeDate.setText(cRequestBookingData.getsFunctionTiming()
+                + " " + cRequestBookingData.getsFunctionDate());
 
         if (!sActivityName.equals("Booking Requests")) {
             holder.tvAccept.setVisibility(View.GONE);
@@ -82,7 +85,7 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
             holder.ivCancel.setVisibility(View.GONE);
 
             holder.tvUserLocation.setVisibility(View.VISIBLE);
-            holder.tvUserLocation.setText(filterLists1.getsLocation());
+            holder.tvUserLocation.setText(cUserData.getsLocation());
         }
     }
 
@@ -160,9 +163,9 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
                 FilterLists filterLists1 = filterLists.get(getAdapterPosition());
 
-                CRequestBookingData cRequestBookingData = getRequestBookingData(getAdapterPosition());
+                CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
 
-                new CCancelRequest(context, true, filterLists1.getsUserID(), filterLists1.getsSubHallId(), cRequestBookingData);
+                new CCancelRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData);
             } else if (v.getId() == R.id.tv_accept) {
 
                 //check Internet Connection
@@ -172,9 +175,9 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
                 FilterLists filterLists1 = filterLists.get(getAdapterPosition());
 
-                CRequestBookingData cRequestBookingData = getRequestBookingData(getAdapterPosition());
+                CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
 
-                new CAcceptRequest(context, true, filterLists1.getsUserID(), filterLists1.getsSubHallId(), cRequestBookingData);
+                new CAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData);
             } else if (v.getId() == R.id.tv_user_location)
                 intentToNextActivity(getAdapterPosition());
         }
@@ -207,21 +210,21 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
             Glide.with(context)
                     .load(filterLists.get(position)
-                            .getsUserProfileImageUri())
+                            .getcUserDataList().getsUserProfileImageUri())
                     .into(ivUserProfile);
 
             btnMessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String sMessageBody = "Hello From App";
-                    Utils.sms(context, filterLists.get(position).getsPhoneNo(), sMessageBody);
+                    Utils.sms(context, filterLists.get(position).getcUserDataList().getsPhoneNo(), sMessageBody);
                 }
             });
 
             btnCall.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Utils.dial(context, filterLists.get(position).getsPhoneNo());
+                    Utils.dial(context, filterLists.get(position).getcUserDataList().getsPhoneNo());
                 }
             });
 
@@ -229,7 +232,7 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
                 @Override
                 public void onClick(View view) {
                     String sMailBody = "Hello From App";
-                    Utils.reportUser(context, filterLists.get(getAdapterPosition()).getsEmail(), sMailBody);
+                    Utils.reportUser(context, filterLists.get(getAdapterPosition()).getcUserDataList().getsEmail(), sMailBody);
                 }
             });
 
@@ -239,7 +242,9 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
                     Intent intent = new Intent(context, UserDetailActivity.class);
                     Bundle bundle = new Bundle();
 
-                    CUserData cUserData = getUserData(position);
+                    FilterLists filterLists1 = filterLists.get(position);
+
+                    CUserData cUserData = filterLists1.getcUserDataList();
 
                     bundle.putString("userDetail", new Gson().toJson(cUserData));
                     intent.putExtras(bundle);
@@ -262,12 +267,8 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
 
             FilterLists filterLists1 = filterLists.get(position);
 
-            CRequestBookingData cRequestBookingData = getRequestBookingData(position);
-            CUserData cUserData = getUserData(position);
-
-            cRequestBookingData.setsAcceptDeniedTiming(filterLists1.getsAcceptDeniedTiming());
-            cUserData.setsSubHallId(filterLists1.getsSubHallId());
-            cUserData.setsUserID(filterLists1.getsUserID());
+            CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
+            CUserData cUserData = filterLists1.getcUserDataList();
 
             Gson gson = new Gson();
 
@@ -284,22 +285,5 @@ public class RequestBookingAdapter extends RecyclerView.Adapter<RequestBookingAd
             intent.putExtras(bundle);
             context.startActivity(intent);
         }
-    }
-
-    private CRequestBookingData getRequestBookingData(int position) {
-        FilterLists filterLists1 = filterLists.get(position);
-
-        return new CRequestBookingData(filterLists1.getsRequestTime()
-                , filterLists1.getsSubHallName(), filterLists1.getsFunctionDate(), filterLists1.getsNoOfGuests(),
-                filterLists1.getsFunctionTiming(), filterLists1.getsDish(), filterLists1.getsPerHead(),
-                filterLists1.getsEstimatedBudget(), filterLists1.getsOtherDetail());
-    }
-
-    private CUserData getUserData(int position) {
-        FilterLists filterLists1 = filterLists.get(position);
-
-        return new CUserData(filterLists1.getsUserFirstName(), filterLists1.getsUserLastName(),
-                filterLists1.getsUserProfileImageUri(), filterLists1.getsEmail(), filterLists1.getsPhoneNo(),
-                filterLists1.getsCity(), filterLists1.getsCountry(), filterLists1.getsLocation());
     }
 }

@@ -9,7 +9,6 @@ public class CUserData {
     private String sCity;
     private String sCountry;
     private String sLocation;
-    private String sSubHallId = null;
 
     private String sUserID;
 
@@ -17,14 +16,14 @@ public class CUserData {
     }
 
     public CUserData(String sUserFirstName, String sUserLastName, String sUserProfileImageUri, String sEmail,
-                     String sPhoneNo, String sCity,String sCountry, String sLocation) {
+                     String sPhoneNo, String sCity, String sCountry, String sLocation) {
         this.sUserFirstName = sUserFirstName;
         this.sUserLastName = sUserLastName;
         this.sUserProfileImageUri = sUserProfileImageUri;
         this.sEmail = sEmail;
         this.sPhoneNo = sPhoneNo;
         this.sCity = sCity;
-        this.sCountry=sCountry;
+        this.sCountry = sCountry;
         this.sLocation = sLocation;
     }
 
@@ -99,14 +98,5 @@ public class CUserData {
 
     public void setsLocation(String sLocation) {
         this.sLocation = sLocation;
-    }
-
-
-    public String getsSubHallId() {
-        return sSubHallId;
-    }
-
-    public void setsSubHallId(String sSubHallId) {
-        this.sSubHallId = sSubHallId;
     }
 }

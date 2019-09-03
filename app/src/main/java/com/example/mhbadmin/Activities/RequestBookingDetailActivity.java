@@ -184,13 +184,13 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
             if (!checkInternetConnection()) {
                 return;
             }
-            new CCancelRequest(this, false, cUserData.getsUserID(), cUserData.getsSubHallId(), cRequestBookingData);
+            new CCancelRequest(this, false, cUserData.getsUserID(), cRequestBookingData);
         } else if (v.getId() == R.id.tv_accept) {
             //check Internet Connection
             if (!checkInternetConnection()) {
                 return;
             }
-            new CAcceptRequest(this, false, cUserData.getsUserID(), cUserData.getsSubHallId(), cRequestBookingData);
+            new CAcceptRequest(this, false, cUserData.getsUserID(), cRequestBookingData);
         }
     }
 

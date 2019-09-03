@@ -38,16 +38,14 @@
                 android:background="@drawable/ic_admin_profile"
                 android:scaleType="centerCrop" />
 
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
-                android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:navigationIcon="@drawable/ic_nav"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

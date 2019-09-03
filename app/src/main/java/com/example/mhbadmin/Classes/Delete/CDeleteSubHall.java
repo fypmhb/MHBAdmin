@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -51,8 +51,7 @@ public class CDeleteSubHall {
     private boolean loopBreakFlag = false;
 
     public CDeleteSubHall(Context context, boolean deleteSubHallHallFlag, String sSubHallDocumentId,
-                          String sSubHallObjectId, boolean fromDeleteSubOrEntireHallFlag,
-                          List<String> sLGetAddHallImagesDownloadUri) {
+                          String sSubHallObjectId, List<String> sLGetAddHallImagesDownloadUri) {
 
         this.context = context;
         this.deleteSubHallHallFlag = deleteSubHallHallFlag;
@@ -70,10 +69,7 @@ public class CDeleteSubHall {
 
         this.firebaseDatabase = FirebaseDatabase.getInstance();
 
-        if (fromDeleteSubOrEntireHallFlag)
-            checkBookings();
-        else
-            deleteSubHallImages();
+        checkBookings();
     }
 
     private void checkBookings() {
@@ -84,7 +80,7 @@ public class CDeleteSubHall {
         progressDialog.setCanceledOnTouchOutside(false);
 
         final DatabaseReference databaseReference = firebaseDatabase
-                .getReference("Bookings")
+                .getReference("Accepted Requests")
                 .child("User Ids");
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -104,11 +100,13 @@ public class CDeleteSubHall {
                                 .child(userId)
                                 .child("Sub Hall Ids")
                                 .child(sSubHallDocumentId)
+                                .child("Timing")
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists())
+                                        if (dataSnapshot.exists()) {
                                             loopBreakFlag = true;
+                                        }
                                     }
 
                                     @Override
@@ -117,10 +115,17 @@ public class CDeleteSubHall {
                                     }
                                 });
                     }
-                    if (loopBreakFlag)
-                        Toast.makeText(context, "You cannot delete this sub hall because it is reserved", Toast.LENGTH_SHORT).show();
-                    else
-                        deleteSubHallImages();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (loopBreakFlag) {
+                                progressDialog.dismiss();
+                                Toast.makeText(context, "You cannot delete this sub hall because it is reserved", Toast.LENGTH_SHORT).show();
+                            } else {
+                                deleteSubHallImages();
+                            }
+                        }
+                    }, 4000);
                 } else {
                     deleteSubHallImages();
                 }
@@ -146,8 +151,8 @@ public class CDeleteSubHall {
                     .delete();
         }
 
-        deleteSubHallData();
         progressDialog.dismiss();
+        deleteSubHallData();
     }
 
     private void deleteSubHallData() {

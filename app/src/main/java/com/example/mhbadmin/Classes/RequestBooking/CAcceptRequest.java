@@ -30,10 +30,8 @@ public class CAcceptRequest {
     private boolean listActivityFlag = false;
 
     private String sUserId = null,
-            sCancellationTiming = null,
             sHallId = null,
-            sHallMarquee = null,
-            sSubHallId = null;
+            sHallMarquee = null;
 
     private boolean loopBreakFlag = false;
 
@@ -45,11 +43,10 @@ public class CAcceptRequest {
 
     private SharedPreferences sp = null;
 
-    public CAcceptRequest(Context context, boolean listActivityFlag, String sUserId, String sSubHallId, CRequestBookingData cRequestBookingData) {
+    public CAcceptRequest(Context context, boolean listActivityFlag, String sUserId, CRequestBookingData cRequestBookingData) {
         this.context = context;
         this.listActivityFlag = listActivityFlag;
         this.sUserId = sUserId;
-        this.sSubHallId = sSubHallId;
         this.cRequestBookingData = cRequestBookingData;
 
         connectivity();
@@ -58,8 +55,6 @@ public class CAcceptRequest {
     }
 
     private void connectivity() {
-
-        sCancellationTiming = Calendar.getInstance().getTime().toString();
 
         sHallId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -109,7 +104,7 @@ public class CAcceptRequest {
                                 .child(sHallMarquee + " Ids")
                                 .child(sHallId)
                                 .child("Sub Hall Ids")
-                                .child(sSubHallId)
+                                .child(cRequestBookingData.getsSubHallId())
                                 .child("Timing");
 
                         databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -177,13 +172,15 @@ public class CAcceptRequest {
 
     private void deleteBookingRequestData() {
 
+
         firebaseDatabase.getReference("Booking Requests")
                 .child("User Ids")
                 .child(sUserId)
                 .child(sHallMarquee + " Ids")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Sub Hall Ids")
-                .child(sSubHallId)
+                .child(cRequestBookingData.getsSubHallId())
+                .child("Timing")
                 .child(cRequestBookingData.getsFunctionDate() + " " + cRequestBookingData.getsFunctionTiming())
                 .removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -196,15 +193,19 @@ public class CAcceptRequest {
 
     private void addAcceptedRequestsBookingsDetail() {
 
+        String sAcceptanceTiming = Calendar.getInstance().getTime().toString();
+
+        cRequestBookingData.setsAcceptDeniedTiming(sAcceptanceTiming);
+
         firebaseDatabase.getReference("Accepted Requests")
                 .child("User Ids")
                 .child(sUserId)
                 .child(sHallMarquee + " Ids")
                 .child(sHallId)
                 .child("Sub Hall Ids")
-                .child(sSubHallId)
+                .child(cRequestBookingData.getsSubHallId())
                 .child("Timing")
-                .child(sCancellationTiming)
+                .child(sAcceptanceTiming)
                 .setValue(cRequestBookingData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

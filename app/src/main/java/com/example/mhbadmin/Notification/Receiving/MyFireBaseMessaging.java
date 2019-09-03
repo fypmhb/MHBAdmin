@@ -3,7 +3,9 @@ package com.example.mhbadmin.Notification.Receiving;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.example.mhbadmin.Activities.RequestBookingDetailActivity;
 import com.example.mhbadmin.Classes.Models.CUserData;
@@ -32,12 +33,21 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 
 import java.net.URL;
+import java.util.Date;
+
+import me.leolin.shortcutbadger.ShortcutBadger;
+
+import static com.example.mhbadmin.Activities.DashBoardActivity.REQUEST_BADGES;
 
 public class MyFireBaseMessaging extends FirebaseMessagingService {
+
+    private SharedPreferences sp = null;
 
     @Override
     public void onMessageReceived(@NonNull final RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+
+        sp = getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
         final String receiver = remoteMessage.getData().get("receiver");
 
@@ -59,18 +69,20 @@ public class MyFireBaseMessaging extends FirebaseMessagingService {
         String icon = remoteMessage.getData().get("icon");
         String title = remoteMessage.getData().get("title");
         String body = remoteMessage.getData().get("body");
-        String sSubHallId = remoteMessage.getData().get("sSubHallId");
 
         String sCUserData = remoteMessage.getData().get("cUserData");
         String sCRequestBookingData = remoteMessage.getData().get("cBookingData");
 
-        CUserData cUserData = new Gson().fromJson(sCUserData, CUserData.class);
+        Gson gson = new Gson();
+
+        CUserData cUserData = gson.fromJson(sCUserData, CUserData.class);
 
         //for cancel or accept classes
         cUserData.setsUserID(userId);
-        cUserData.setsSubHallId(sSubHallId);
 
-        int j = Integer.parseInt(userId.replaceAll("[\\D]", ""));
+        sCUserData = gson.toJson(cUserData);
+
+        int j = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 
         Intent intent = new Intent(this, RequestBookingDetailActivity.class);
         Bundle bundle = new Bundle();
@@ -92,28 +104,54 @@ public class MyFireBaseMessaging extends FirebaseMessagingService {
 
             Bitmap largeIcon = getCircleBitmap(image);
 
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            assert icon != null;
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                     .setSmallIcon(Integer.parseInt(icon))
                     .setLargeIcon(largeIcon)
                     .setContentTitle(title)
-                    .setContentText(body)
                     .setAutoCancel(true)
                     .setSound(defaultSound)
+                    .setStyle(inboxStyle)
+                    .setStyle(inboxStyle.addLine(body))
                     .setContentIntent(pendingIntent);
 
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-
-            int i = 0;
-
-            if (j > 0) {
-                i = j;
+            //Notification Badge
+            if (sp.getInt(REQUEST_BADGES, 0) != 0) {
+                int badge = sp.getInt(REQUEST_BADGES, 0);
+                badge += 1;
+                createBadge(badge);
+            } else {
+                createBadge(1);
             }
 
-            notificationManager.notify(i, builder.build());
-        } catch (Exception e) {
+            assert notificationManager != null;
+            notificationManager.notify(j, builder.build());
+        } catch (
+                Exception e) {
             Toast.makeText(this, "Notification failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void createBadge(int badge) {
+
+        ShortcutBadger.applyCount(this, badge);
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt(REQUEST_BADGES, badge);
+        editor.commit();
+       /* try {
+            Badges.setBadge(this, badge);
+
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt(REQUEST_BADGES, badge);
+            editor.commit();
+        } catch (BadgesNotSupportedException b) {
+            b.printStackTrace();
+        }*/
     }
 
     private Bitmap getCircleBitmap(Bitmap bitmap) {

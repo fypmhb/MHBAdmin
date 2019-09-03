@@ -102,52 +102,52 @@ public class CDeleteEntireHall {
                 .getReference("Bookings")
                 .child("User Ids");
 
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
 
-                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                            if (loopBreakFlag)
-                                break;
-
-                            for (int i = 1; i <= noOfTabs; i++) {
-                                sSubHallDocumentId = sp.getString("sSubHallDocumentId" + i, null);
-
-                                String sClientId = dataSnapshot1.getKey();
-                                assert sClientId != null;
-                                databaseReference.child(sClientId)
-                                        .child("Hall Ids")
-                                        .child(userId)
-                                        .child("Sub Hall Ids")
-                                        .child(sSubHallDocumentId)
-                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if (dataSnapshot.exists())
-                                                    loopBreakFlag = true;
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-                            }
-                        }
                         if (loopBreakFlag)
-                            Toast.makeText(context, "You cannot delete this hall because it's sub hall is reserved", Toast.LENGTH_SHORT).show();
-                        else
-                            deleteSubHalls();
+                            break;
+
+                        for (int i = 1; i <= noOfTabs; i++) {
+                            sSubHallDocumentId = sp.getString("sSubHallDocumentId" + i, null);
+
+                            String sClientId = dataSnapshot1.getKey();
+                            assert sClientId != null;
+                            databaseReference.child(sClientId)
+                                    .child("Hall Ids")
+                                    .child(userId)
+                                    .child("Sub Hall Ids")
+                                    .child(sSubHallDocumentId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists())
+                                                loopBreakFlag = true;
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        }
                     }
+                    if (loopBreakFlag)
+                        Toast.makeText(context, "You cannot delete this hall because it's sub hall is reserved", Toast.LENGTH_SHORT).show();
+                    else
+                        deleteSubHalls();
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
     }
 
     private void deleteSubHalls() {
@@ -166,7 +166,7 @@ public class CDeleteEntireHall {
         CSubHallData cSubHallData = new Gson().fromJson(getsSubHallObject, CSubHallData.class);
 
         new CDeleteSubHall(context, true, sSubHallDocumentId, getsSubHallObjectId,
-                false, cSubHallData.getsLGetAddHallImagesDownloadUri());
+                cSubHallData.getsLGetAddHallImagesDownloadUri());
 
         progressDialog.dismiss();
     }

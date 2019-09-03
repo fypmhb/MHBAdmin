@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".Activities.FragmentRelated.DeleteSubHallActivity">
+    tools:context=".Activities.FragmentRelated.ShowDeleteSubHallActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"

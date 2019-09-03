@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
+import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.Delete.CDeleteSubHall;
 import com.example.mhbadmin.Classes.Models.CSubHallData;
 import com.example.mhbadmin.R;
 import com.google.gson.Gson;
@@ -23,13 +26,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
+import static com.example.mhbadmin.Activities.DashBoardActivity.S_SUB_HALL_DOCUMENT_ID;
+import static com.example.mhbadmin.Activities.DashBoardActivity.S_SUB_HALL_OBJECT;
+import static com.example.mhbadmin.Fragments.FUpdateSubHallInfo.S_SUB_HALL_OBJECT_ID;
 
-public class FSubHallMarqueeDetail extends Fragment {
 
-    static final String S_SUB_HALL_DOCUMENT_ID = "S_SUB_HALL_DOCUMENT_ID";
-    static final String S_SUB_HALL_OBJECT = "S_SUB_HALL_OBJECT";
+public class FShowDeleteSubHall extends Fragment implements View.OnClickListener {
 
     private View view = null;
+
+    private Context context = null;
 
     private TextView tvAveragePerHeadRate = null,
             tvSubHallName = null,
@@ -44,6 +50,8 @@ public class FSubHallMarqueeDetail extends Fragment {
             tvMuttonPerHeadRate = null,
             tvBeefPerHeadRate = null;
 
+    private Button btnDeleteSubHall = null;
+
     private ViewPager imageViewPager = null;
 
     //FireBase work
@@ -52,14 +60,16 @@ public class FSubHallMarqueeDetail extends Fragment {
 
     private ProgressDialog progressDialog = null;
 
-    private String sHallMarquee = null;
+    private String sHallMarquee = null,
+            sActivityName = null;
 
-    private String getsSubHallObject = null;
+    private String sSubHallDocumentId = null,
+            getsSubHallObjectId = null,
+            getsSubHallObject = null;
 
     private CSubHallData cSubHallData = null;
 
-
-    public FSubHallMarqueeDetail() {
+    public FShowDeleteSubHall() {
         // Required empty public constructor
     }
 
@@ -67,6 +77,8 @@ public class FSubHallMarqueeDetail extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            sSubHallDocumentId = getArguments().getString(S_SUB_HALL_DOCUMENT_ID);
+            getsSubHallObjectId = getArguments().getString(S_SUB_HALL_OBJECT_ID);
             getsSubHallObject = getArguments().getString(S_SUB_HALL_OBJECT);
         }
     }
@@ -74,16 +86,21 @@ public class FSubHallMarqueeDetail extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_sub_hall_marquee_detail, container, false);
+        view = inflater.inflate(R.layout.fragment_show_delete_sub_hall, container, false);
 
         connectivity();
 
         checkFireBaseState();
 
+        //set click listener on button
+        btnDeleteSubHall.setOnClickListener(this);
+
         return view;
     }
 
     private void connectivity() {
+
+        context = getActivity();
 
         sp = getActivity().getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
@@ -102,6 +119,8 @@ public class FSubHallMarqueeDetail extends Fragment {
         tvMuttonPerHeadRate = (TextView) view.findViewById(R.id.tv_mutton_per_head_rate);
         tvBeefPerHeadRate = (TextView) view.findViewById(R.id.tv_beef_per_head_rate);
 
+        btnDeleteSubHall = (Button) view.findViewById(R.id.btn_delete_sub_hall);
+
         imageViewPager = (ViewPager) view.findViewById(R.id.images_view_pager);
     }
 
@@ -111,6 +130,9 @@ public class FSubHallMarqueeDetail extends Fragment {
         progressDialog.show();
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
+
+        if (sp.getString("sDeleteShowSubHall", null) != null)
+            this.sActivityName = sp.getString("sDeleteShowSubHall", null);
 
         if (sp.getString(META_DATA, null) != null)
             this.sHallMarquee = sp.getString(META_DATA, null);
@@ -131,7 +153,7 @@ public class FSubHallMarqueeDetail extends Fragment {
         imageViewPager.setAdapter(imageSwipeAdapter);
 
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new MyTimerTask(), 3000, 4000);
+        timer.scheduleAtFixedRate(new FShowDeleteSubHall.MyTimerTask(), 3000, 4000);
 
         int chickenPerHead = Integer.parseInt(cSubHallData.getsChickenPerHead()),
                 muttonPerHead = Integer.parseInt(cSubHallData.getsMuttonPerHead()),
@@ -159,21 +181,53 @@ public class FSubHallMarqueeDetail extends Fragment {
         tvMuttonPerHeadRate.setText(cSubHallData.getsMuttonPerHead());
         tvBeefPerHeadRate.setText(cSubHallData.getsBeefPerHead());
 
+        if (sActivityName.equals("show")) {
+            btnDeleteSubHall.setVisibility(View.GONE);
+        }
+
         progressDialog.dismiss();
     }
 
-    public static FSubHallMarqueeDetail newInstance(String sSubHallObject) {
-        FSubHallMarqueeDetail fragment = new FSubHallMarqueeDetail();
+    public static FShowDeleteSubHall newInstance(String sSubHallDocumentId, String sSubHallObjectId, String sSubHallObject) {
+        FShowDeleteSubHall fragment = new FShowDeleteSubHall();
         Bundle args = new Bundle();
+        args.putString(S_SUB_HALL_DOCUMENT_ID, sSubHallDocumentId);
+        args.putString(S_SUB_HALL_OBJECT_ID, sSubHallObjectId);
         args.putString(S_SUB_HALL_OBJECT, sSubHallObject);
         fragment.setArguments(args);
         return fragment;
     }
 
+    @Override
+    public void onClick(View view) {
+
+        if (view.getId() == R.id.btn_delete_sub_hall) {
+
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+
+            new CDeleteSubHall(context, true, sSubHallDocumentId, getsSubHallObjectId,
+                    cSubHallData.getsLGetAddHallImagesDownloadUri());
+        }
+    }
+
+    private boolean checkInternetConnection() {
+        // if there is no internet connection
+
+        CNetworkConnection CNetworkConnection = new CNetworkConnection();
+        if (CNetworkConnection.isConnected(context)) {
+            CNetworkConnection.buildDialog(context).show();
+            return false;
+        }
+        return true;
+    }
+
     // timer class for image swipe
     public class MyTimerTask extends TimerTask {
 
-        int numberOfHallEntranceImages = cSubHallData.getsLGetAddHallImagesDownloadUri().size() - 1;
+        int numberOfSubHallImages = cSubHallData.getsLGetAddHallImagesDownloadUri().size() - 1;
         int i = 0;
 
         @Override
@@ -185,7 +239,7 @@ public class FSubHallMarqueeDetail extends Fragment {
                         if (imageViewPager.getCurrentItem() == i) {
                             i = i + 1;
                             imageViewPager.setCurrentItem(i);
-                        } else if (i == numberOfHallEntranceImages + 1) {
+                        } else if (i == numberOfSubHallImages + 1) {
                             i = 0;
                             imageViewPager.setCurrentItem(i);
                         }

@@ -2,6 +2,7 @@ package com.example.mhbadmin.Fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,9 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
@@ -19,29 +22,40 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.mhbadmin.AdapterClasses.RequestBookingAdapter;
+import com.example.mhbadmin.AdapterClasses.RequestBookingHistoryAdapter;
 import com.example.mhbadmin.Classes.CNetworkConnection;
-import com.example.mhbadmin.Classes.GetData.CGetRequestBookingData;
+import com.example.mhbadmin.Classes.GetData.CGetRequestBookingHistoryData;
 import com.example.mhbadmin.Classes.Models.FilterLists;
 import com.example.mhbadmin.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.mhbadmin.Fragments.FSubHallMarqueeDetail.S_SUB_HALL_DOCUMENT_ID;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
-public class FRequestBookingList extends Fragment {
+import static com.example.mhbadmin.Activities.DashBoardActivity.BOOKING_BADGE;
+import static com.example.mhbadmin.Activities.DashBoardActivity.REQUEST_BADGES;
+import static com.example.mhbadmin.Activities.DashBoardActivity.S_SUB_HALL_DOCUMENT_ID;
+
+@RequiresApi(api = Build.VERSION_CODES.M)
+public class FRequestBookingList extends Fragment implements View.OnClickListener, RecyclerView.OnScrollChangeListener {
 
     private View fragmentView = null;
     private Context context = null;
 
+    private Button btnReturnToTop = null;
+
+    private SharedPreferences sp = null;
+
     private SwipeRefreshLayout mySwipeRefreshLayout = null;
 
-    private RequestBookingAdapter requestBookingAdapter = null;
-    private List<FilterLists> filterLists=null;
+    private RequestBookingHistoryAdapter requestBookingHistoryAdapter = null;
+    private List<FilterLists> filterLists = null;
+
+    private RecyclerView rvRequestBookingList = null;
 
     private String sSubHallDocumentId = null,
-            sRequestBooking = null;
+            sRequestBookingHistory = null;
 
     public FRequestBookingList() {
         // Required empty public constructor
@@ -63,6 +77,8 @@ public class FRequestBookingList extends Fragment {
 
         connectivity();
 
+        removeBadges();
+
         getDataFromFireBase();
 
         mySwipeRefreshLayout.setOnRefreshListener(
@@ -73,7 +89,7 @@ public class FRequestBookingList extends Fragment {
                         // The method calls setRefreshing(false) when it's finished.
 
                         filterLists.clear();
-                        requestBookingAdapter.notifyDataSetChanged();
+                        requestBookingHistoryAdapter.notifyDataSetChanged();
                         getDataFromFireBase();
                     }
                 });
@@ -83,6 +99,13 @@ public class FRequestBookingList extends Fragment {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
+        //set click and scroll listener
+        btnReturnToTop.setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            rvRequestBookingList.setOnScrollChangeListener(this);
+        }
+
         return fragmentView;
     }
 
@@ -90,25 +113,80 @@ public class FRequestBookingList extends Fragment {
 
         context = getActivity();
 
+        sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
+
+        btnReturnToTop = (Button) fragmentView.findViewById(R.id.btn_return_to_top);
+
+        if (sp.getString("sRequestBookingHistory", null) != null)
+            sRequestBookingHistory = sp.getString("sRequestBookingHistory", null);
+
         mySwipeRefreshLayout = (SwipeRefreshLayout) fragmentView.findViewById(R.id.swipe_refresh);
 
-        SharedPreferences sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
-
-        if (sp.getString("Request Booking", null) != null)
-            sRequestBooking = sp.getString("Request Booking", null);
-
         //RecyclerView
-        RecyclerView rvRequestBookingList = (RecyclerView) fragmentView.findViewById(R.id.rv_request_booking_list);
+        rvRequestBookingList = (RecyclerView) fragmentView.findViewById(R.id.rv_request_booking_list);
         rvRequestBookingList.setHasFixedSize(true);
 
         filterLists = new ArrayList<>();
 
-        requestBookingAdapter = new RequestBookingAdapter(context, sRequestBooking, filterLists);
+        requestBookingHistoryAdapter = new RequestBookingHistoryAdapter(context, sRequestBookingHistory, filterLists);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
 
         rvRequestBookingList.setLayoutManager(mLayoutManager);
-        rvRequestBookingList.setAdapter(requestBookingAdapter);
+        rvRequestBookingList.setAdapter(requestBookingHistoryAdapter);
+    }
+
+    private void removeBadges() {
+        SharedPreferences.Editor editor = sp.edit();
+        if (sRequestBookingHistory.equals("Booking Requests")) {
+
+            editor.remove(REQUEST_BADGES);
+            editor.commit();
+
+            ShortcutBadger.removeCount(context);
+
+            if (sp.getInt(BOOKING_BADGE, 0) != 0) {
+                int badge = sp.getInt(BOOKING_BADGE, 0);
+                ShortcutBadger.applyCount(context, badge);
+            }
+            /*
+            try {
+                Badges.removeBadge(context);
+
+                editor.remove(REQUEST_BADGES);
+                editor.commit();
+
+                if (sp.getInt(BOOKING_BADGE, 0) != 0) {
+                    int badge = sp.getInt(BOOKING_BADGE, 0);
+                    Badges.setBadge(context, badge);
+                }
+            } catch (BadgesNotSupportedException e) {
+                e.printStackTrace();
+            }*/
+        } else if (sRequestBookingHistory.equals("Accepted Requests")) {
+
+            editor.remove(BOOKING_BADGE);
+            editor.commit();
+
+            if (sp.getInt(REQUEST_BADGES, 0) != 0) {
+                int badge = sp.getInt(REQUEST_BADGES, 0);
+                ShortcutBadger.applyCount(context, badge);
+            }
+            /*try {
+                Badges.removeBadge(context);
+
+                editor.remove(BOOKING_BADGE);
+                editor.commit();
+
+                if (sp.getInt(REQUEST_BADGES, 0) != 0) {
+                    int badge = sp.getInt(REQUEST_BADGES, 0);
+                    Badges.setBadge(context, badge);
+                }
+
+            } catch (BadgesNotSupportedException e) {
+                e.printStackTrace();
+            }*/
+        }
     }
 
     private void getDataFromFireBase() {
@@ -118,12 +196,11 @@ public class FRequestBookingList extends Fragment {
             return;
         }
 
-        CGetRequestBookingData cGetRequestBookingData = new CGetRequestBookingData(context, filterLists, requestBookingAdapter, sSubHallDocumentId);
+        CGetRequestBookingHistoryData cGetRequestBookingHistoryData = new CGetRequestBookingHistoryData(context,
+                filterLists, requestBookingHistoryAdapter, sSubHallDocumentId);
 
-        if (sRequestBooking.equals("Booking Requests"))
-            cGetRequestBookingData.getRequestsData();
-        else                                         //else if (sRequestBooking.equals("Accepted Requests"))
-            cGetRequestBookingData.getAcceptedRequestsData();
+        if (sRequestBookingHistory != null)
+            cGetRequestBookingHistoryData.getRequestBookingHistoryData(sRequestBookingHistory);
 
         mySwipeRefreshLayout.setRefreshing(false);
     }
@@ -170,16 +247,32 @@ public class FRequestBookingList extends Fragment {
             }
         });
 
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    private void getData(CharSequence s)
-    {
+    private void getData(CharSequence s) {
         //FILTER AS YOU TYPE
         try {
-            requestBookingAdapter.getFilter().filter(s);
+            requestBookingHistoryAdapter.getFilter().filter(s);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btn_return_to_top) {
+            if (rvRequestBookingList != null)
+                rvRequestBookingList.smoothScrollToPosition(0);
+        }
+    }
+
+    @Override
+    public void onScrollChange(View view, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+        if (scrollY > oldScrollY)
+            btnReturnToTop.setVisibility(View.VISIBLE);
+        else
+            btnReturnToTop.setVisibility(View.GONE);
     }
 }
