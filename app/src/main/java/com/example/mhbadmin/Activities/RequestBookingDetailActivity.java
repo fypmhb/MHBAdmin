@@ -11,8 +11,7 @@ import com.bumptech.glide.Glide;
 import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Classes.Models.CUserData;
-import com.example.mhbadmin.Classes.RequestBooking.CAcceptRequest;
-import com.example.mhbadmin.Classes.RequestBooking.CCancelRequest;
+import com.example.mhbadmin.Classes.RequestBooking.CCancelAcceptRequest;
 import com.example.mhbadmin.R;
 import com.example.mhbadmin.Utils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -184,13 +183,13 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
             if (!checkInternetConnection()) {
                 return;
             }
-            new CCancelRequest(this, false, cUserData.getsUserID(), cRequestBookingData);
+            new CCancelAcceptRequest(this, false, cUserData.getsUserID(), cRequestBookingData, "Canceled Requests");
         } else if (v.getId() == R.id.tv_accept) {
             //check Internet Connection
             if (!checkInternetConnection()) {
                 return;
             }
-            new CAcceptRequest(this, false, cUserData.getsUserID(), cRequestBookingData);
+            new CCancelAcceptRequest(this, false, cUserData.getsUserID(), cRequestBookingData, "Accepted Requests");
         }
     }
 

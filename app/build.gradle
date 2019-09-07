@@ -58,6 +58,8 @@ dependencies {
     //load images
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    //crop image
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 
     // transition library
     implementation 'com.github.mohammadatif:Animatoo:master'
@@ -88,7 +90,6 @@ dependencies {
 
     //Notification Badge
 //    implementation 'com.github.arturogutierrez:badges:1.0.5@aar'
-
     implementation "me.leolin:ShortcutBadger:1.1.22@aar"
 }
 apply plugin: 'com.google.gms.google-services'

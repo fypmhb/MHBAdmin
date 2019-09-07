@@ -126,39 +126,35 @@ public class UserDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     // Set the background and text colors of a toolbar given a
-// bitmap image to match
+    // bitmap image to match
     public void setToolbarColor(Bitmap bitmap) {
+        // Generate the palette and get the vibrant swatch
+        // See the createPaletteSync() method
+        // from the code snippet above
+        Palette p = createPaletteSync(bitmap);
+        Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
+
+        // Load default colors
+        int backgroundColor = ContextCompat.getColor(getApplicationContext(),
+                R.color.colorPrimaryDark);
+        /*int textColor = ContextCompat.getColor(getApplicationContext(),
+                R.color.blackColor);*/
+
+        // Check that the Vibrant swatch is available
+        if (vibrantSwatch != null) {
+            backgroundColor = vibrantSwatch.getRgb();
+//            textColor = vibrantSwatch.getTitleTextColor();
+        }
+/*
+        // Set the toolbar background and text colors
+        toolbar.setBackgroundColor(backgroundColor);
+        toolbar.setTitleTextColor(textColor);*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Generate the palette and get the vibrant swatch
-            // See the createPaletteSync() method
-            // from the code snippet above
-            Palette p = createPaletteSync(bitmap);
-            Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
-
-            // Load default colors
-            int backgroundColor = ContextCompat.getColor(this,
-                    R.color.colorPrimaryDark);
-//            int textColor = ContextCompat.getColor(this,
-//                    R.color.blackColor);
-
-            // Check that the Vibrant swatch is available
-            if (vibrantSwatch != null) {
-                backgroundColor = vibrantSwatch.getRgb();
-//                textColor = vibrantSwatch.getTitleTextColor();
-            }
-
-            /*Toolbar toolbar=(Toolbar) findViewById(R.id.toolbar) ;
-
-            // Set the toolbar background and text colors
-            toolbar.setBackgroundColor(backgroundColor);
-            toolbar.setTitleTextColor(textColor);*/
-
             // Set the statusBar background
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(backgroundColor);
-
         }
     }
 }

@@ -41,7 +41,7 @@ import java.util.List;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 import static com.example.mhbadmin.Activities.DashBoardActivity.S_SUB_HALL_DOCUMENT_ID;
-import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_REQUEST_CODE;
+import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_PICK_GALLERY_CODE;
 import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
 public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener {
@@ -330,7 +330,7 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Minimum 5 Sub Hall Picture"), IMAGE_REQUEST_CODE);
+        startActivityForResult(Intent.createChooser(intent, "Select Minimum 5 Sub Hall Picture"), IMAGE_PICK_GALLERY_CODE);
     }
 
     private void uploadDataToFireBaseAndIntent() {
@@ -511,7 +511,7 @@ public class FUpdateSubHallInfo extends Fragment implements View.OnClickListener
         Uri mImageUri = null;
         try {
             // When an Image is picked
-            if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK
+            if (requestCode == IMAGE_PICK_GALLERY_CODE && resultCode == Activity.RESULT_OK
                     && data != null) {
 
                 if (data.getData() != null) {

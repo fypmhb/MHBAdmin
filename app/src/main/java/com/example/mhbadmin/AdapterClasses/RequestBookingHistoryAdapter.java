@@ -25,8 +25,7 @@ import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Classes.Models.CUserData;
 import com.example.mhbadmin.Classes.Models.FilterLists;
-import com.example.mhbadmin.Classes.RequestBooking.CAcceptRequest;
-import com.example.mhbadmin.Classes.RequestBooking.CCancelRequest;
+import com.example.mhbadmin.Classes.RequestBooking.CCancelAcceptRequest;
 import com.example.mhbadmin.Filters.RequestBookingFilter;
 import com.example.mhbadmin.R;
 import com.example.mhbadmin.Utils;
@@ -165,7 +164,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
 
                 CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
 
-                new CCancelRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData);
+                new CCancelAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData, "Canceled Requests");
             } else if (v.getId() == R.id.tv_accept) {
 
                 //check Internet Connection
@@ -177,7 +176,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
 
                 CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
 
-                new CAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData);
+                new CCancelAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData, "Accepted Requests");
             } else if (v.getId() == R.id.tv_user_location)
                 intentToNextActivity(getAdapterPosition());
         }
@@ -199,7 +198,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             ImageView ivUserProfile = (ImageView) alertView.findViewById(R.id.iv_user_profile);
 
             ImageButton btnMessage = (ImageButton) alertView.findViewById(R.id.ib_message);
-            final ImageButton btnCall = (ImageButton) alertView.findViewById(R.id.ib_call);
+            ImageButton btnCall = (ImageButton) alertView.findViewById(R.id.ib_call);
             ImageButton btnMail = (ImageButton) alertView.findViewById(R.id.ib_mail);
             ImageButton btnInfo = (ImageButton) alertView.findViewById(R.id.ib_info);
 
@@ -232,7 +231,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
                 @Override
                 public void onClick(View view) {
                     String sMailBody = "Hello From App";
-                    Utils.reportUser(context, filterLists.get(getAdapterPosition()).getcUserDataList().getsEmail(), sMailBody);
+                    Utils.reportUser(context, filterLists.get(position).getcUserDataList().getsEmail(), sMailBody);
                 }
             });
 

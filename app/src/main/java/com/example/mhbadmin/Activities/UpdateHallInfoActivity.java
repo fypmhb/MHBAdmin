@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
-import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_REQUEST_CODE;
+import static com.example.mhbadmin.Fragments.FSignUp.IMAGE_PICK_GALLERY_CODE;
 import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
 public class UpdateHallInfoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -346,7 +346,7 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Hall Entrance Picture"), IMAGE_REQUEST_CODE);
+            startActivityForResult(Intent.createChooser(intent, "Select Hall Entrance Picture"), IMAGE_PICK_GALLERY_CODE);
         } else {
             bImageFlag = true;
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -392,7 +392,7 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
             if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 String permissions[] = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                requestPermissions(permissions, IMAGE_REQUEST_CODE);
+                requestPermissions(permissions, IMAGE_PICK_GALLERY_CODE);
             } else { // permission granted
                 openCamera();
             }
@@ -405,12 +405,12 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
     private void openCamera() {
         bImageFlag = true;
         Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(i, IMAGE_REQUEST_CODE);
+        startActivityForResult(i, IMAGE_PICK_GALLERY_CODE);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == IMAGE_REQUEST_CODE) {
+        if (requestCode == IMAGE_PICK_GALLERY_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             }
@@ -592,11 +592,11 @@ public class UpdateHallInfoActivity extends AppCompatActivity implements View.On
     //Select image and set to imageView
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IMAGE_REQUEST_CODE || requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
+        if (requestCode == IMAGE_PICK_GALLERY_CODE || requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
                 && resultCode == RESULT_OK
                 && data != null) {
             if (bImageFlag) {
-                if (requestCode == IMAGE_REQUEST_CODE) {
+                if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                     if (resultCode == RESULT_OK) {
 
                         //take image from camera

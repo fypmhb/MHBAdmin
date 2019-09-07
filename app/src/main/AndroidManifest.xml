@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
-    package="com.example.mhbadmin">
+    package="com.example.mhbadmin"
+    android:installLocation="auto">
 
     <dist:module dist:instant="true" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- gsf -->
@@ -17,18 +18,18 @@
     <!--    offline notification-->
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
-    <!--    Notification Badge-->
+    <!-- &lt;!&ndash;    Notification Badge&ndash;&gt;
 
-    <!--    SamSung-->
-    <uses-permission android:name="com.sec.android.provider.badge.premission.READ" />
-    <uses-permission android:name="com.sec.android.provider.badge.premission.WRITE" />
+     &lt;!&ndash;    SamSung&ndash;&gt;
+     <uses-permission android:name="com.sec.android.provider.badge.premission.READ" />
+     <uses-permission android:name="com.sec.android.provider.badge.premission.WRITE" />
 
-    <!--    Sony-->
-    <uses-permission android:name="com.sonyericsson.home.premission.BROADCAST_BADGE" />
+     &lt;!&ndash;    Sony&ndash;&gt;
+     <uses-permission android:name="com.sonyericsson.home.premission.BROADCAST_BADGE" />
 
-    <!--    HTC-->
-    <uses-permission android:name="com.htc.launcher.premission.READ_SETTINGS" />
-    <uses-permission android:name="com.htc.launcher.premission.UPDATE_SHORTCUT" />
+     &lt;!&ndash;    HTC&ndash;&gt;
+     <uses-permission android:name="com.htc.launcher.premission.READ_SETTINGS" />
+     <uses-permission android:name="com.htc.launcher.premission.UPDATE_SHORTCUT" />-->
 
     <application
         android:name=".Classes.Models.ObjectBox.MHBAdminDB"
@@ -37,42 +38,56 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".Activities.UserDetailActivity" />
+
         <activity
             android:name=".Activities.FragmentRelated.HistoryActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
+
         <activity
             android:name=".Activities.RequestBookingDetailActivity"
             android:parentActivityName=".Activities.FragmentRelated.RequestBookingListActivity" />
+
         <activity
             android:name=".Activities.FragmentRelated.ShowDeleteSubHallActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
+
         <activity
             android:name=".Activities.AboutUsActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
+
         <activity
             android:name=".Activities.FragmentRelated.UpdateSubHallInfoActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
+
         <activity
             android:name=".Activities.UpdatePasswordActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
+
         <activity
             android:name=".Activities.UpdateHallInfoActivity"
             android:parentActivityName=".Activities.ProfileActivity" />
+
         <activity
             android:name=".Activities.ProfileActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
+
         <activity android:name=".Activities.AddSubHallActivity" />
+
         <activity
             android:name=".Activities.FragmentRelated.RequestBookingListActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
+
         <activity
             android:name=".Activities.DashBoardActivity"
             android:label="@string/title_activity_dash_board"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".Activities.LogInSignUpActivity"
             android:windowSoftInputMode="stateHidden" />
+
         <activity android:name=".Activities.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -91,6 +106,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
+
         <service
             android:name=".Notification.Receiving.MyFireBaseService"
             android:enabled="true"
@@ -101,6 +117,8 @@
         </service>
 
         <receiver android:name=".BroadcastReceiver.BNotification" />
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
 
     </application>
 

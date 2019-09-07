@@ -3,16 +3,14 @@ package com.example.mhbadmin.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -27,9 +25,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,13 +42,14 @@ import com.example.mhbadmin.AdapterClasses.SelectImagesAdapter;
 import com.example.mhbadmin.Classes.CCustomToast;
 import com.example.mhbadmin.Classes.CGetImageName;
 import com.example.mhbadmin.Classes.CNetworkConnection;
+import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.Classes.Models.CSignUpData;
 import com.example.mhbadmin.Classes.Upload.CUploadSignUpData;
-import com.example.mhbadmin.Classes.CValidations;
 import com.example.mhbadmin.R;
 import com.santalu.maskedittext.MaskEditText;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +57,10 @@ import static android.app.Activity.RESULT_OK;
 
 public class FSignUp extends Fragment implements View.OnClickListener {
 
-    public final static int IMAGE_REQUEST_CODE = 121;
+    private static final int CAMERA_REQUEST_CODE = 100;
+    private static final int STORAGE_REQUEST_CODE = 200;
+    public static final int IMAGE_PICK_GALLERY_CODE = 300;
+    private static final int IMAGE_PICK_CAMERA_CODE = 400;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 120;
 
     private Context context = null;
@@ -110,6 +116,10 @@ public class FSignUp extends Fragment implements View.OnClickListener {
             sACHeater = "No",
             sParking = "No";
 
+    //arrays of permissions to be requested
+    private String[] cameraPermissions = null;
+    private String[] storagePermissions = null;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_sign_up, container, false);
@@ -131,6 +141,10 @@ public class FSignUp extends Fragment implements View.OnClickListener {
     private void connectivity() {
 
         context = getActivity();
+
+        //init arrays of permissions
+        cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
         cCustomToast = new CCustomToast();
 
@@ -238,9 +252,13 @@ public class FSignUp extends Fragment implements View.OnClickListener {
             hideSoftKeyboard(v);
         } else if (v.getId() == R.id.iv_upload_image) {
             //pass false for open gallery to select multiple pictures.
-            intentForOpenGallery(true);
+            //Gallery clicked
+            if (!checkStoragePermission())
+                requestStoragePermission();
+            else
+                intentForOpenGallery(true);
         } else if (v.getId() == R.id.iv_add_manager_profile) {
-            profilePicture();
+            showImagePicDialog();
         } else if (v.getId() == R.id.btn_sign_up) {
             signUp();
         } else if (v.getId() == R.id.tv_already_have_one) {
@@ -265,17 +283,144 @@ public class FSignUp extends Fragment implements View.OnClickListener {
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Hall Entrance Picture"), IMAGE_REQUEST_CODE);
+            startActivityForResult(Intent.createChooser(intent, "Select Hall Entrance Picture"), CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         } else {
             bImageFlag = true;
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             startActivityForResult(Intent.createChooser(intent,
-                    "Select Profile Image"), CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                    "Select Profile Image"), IMAGE_PICK_GALLERY_CODE);
         }
     }
 
-    private void profilePicture() {
+    private void showImagePicDialog() {
+        //show dialog containing options Camera and Gallery to pick the image
+
+        String[] options = {"Camera", "Gallery"};
+        //alert dialog
+        androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        //set title
+        builder.setTitle("Pick Image From");
+        //set items to dialog
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //handle dialog item clicks
+                if (which == 0) {
+                    //Camera clicked
+                    if (!checkCameraPermission()) {
+                        requestCameraPermission();
+                    } else {
+                        pickFromCamera();
+                    }
+                } else if (which == 1) {
+                    //Gallery clicked
+                    if (!checkStoragePermission()) {
+                        requestStoragePermission();
+                    } else {
+                        intentForOpenGallery(false);
+                    }
+                }
+            }
+        });
+        //create and show dialog
+        builder.create().show();
+    }
+
+    private boolean checkCameraPermission() {
+        //check if storage permission is enabled or not
+        //return true if enabled
+        //return false if not enabled
+        boolean result = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                == (PackageManager.PERMISSION_GRANTED);
+
+        boolean result1 = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
+        return result && result1;
+    }
+
+    private void requestCameraPermission() {
+        //request runtime storage permission
+        ActivityCompat.requestPermissions(getActivity(), cameraPermissions, CAMERA_REQUEST_CODE);
+    }
+
+    private void pickFromCamera() {
+        bImageFlag = true;
+
+        //Intent of picking image from device camera
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+        //put image uri
+        uriManagerProfile = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        //intent to start camera
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriManagerProfile);
+
+        if (cameraIntent.resolveActivity(context.getPackageManager()) != null)
+            startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+    }
+
+    private boolean checkStoragePermission() {
+        //check if storage permission is enabled or not
+        //return true if enabled
+        //return false if not enabled
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestStoragePermission() {
+        //request runtime storage permission
+        ActivityCompat.requestPermissions(getActivity(), storagePermissions, STORAGE_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        /*This method called when user press Allow or Deny from permission request dialog
+         * here we will handle permission cases (allowed & denied)*/
+
+        switch (requestCode) {
+            case CAMERA_REQUEST_CODE: {
+                //picking from camera, first check if camera and storage permissions allowed or not
+                if (grantResults.length > 0) {
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted && writeStorageAccepted) {
+                        //permissions enabled
+                        pickFromCamera();
+                    } else {
+                        //permissions denied
+                        Toast.makeText(context, "Please enable camera & storage permission", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            break;
+            case STORAGE_REQUEST_CODE: {
+
+                //picking from gallery, first check if storage permissions allowed or not
+                if (grantResults.length > 0) {
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageAccepted) {
+                        //permissions enabled
+                        intentForOpenGallery(false);
+                    } else {
+                        //permissions denied
+                        Toast.makeText(context, "Please enable storage permission", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+            }
+            break;
+        }
+
+
+    }
+
+
+    /*private void profilePicture() {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         builder.setMessage("Complete This Action Using");
@@ -311,7 +456,7 @@ public class FSignUp extends Fragment implements View.OnClickListener {
             if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
                     context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
                 String permissions[] = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                requestPermissions(permissions, IMAGE_REQUEST_CODE);
+                requestPermissions(permissions, IMAGE_PICK_GALLERY_CODE);
             } else { // permission granted
                 openCamera();
             }
@@ -324,24 +469,18 @@ public class FSignUp extends Fragment implements View.OnClickListener {
     private void openCamera() {
         bImageFlag = true;
         Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(i, IMAGE_REQUEST_CODE);
+        startActivityForResult(i, IMAGE_PICK_GALLERY_CODE);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == IMAGE_REQUEST_CODE) {
+        if (requestCode == IMAGE_PICK_GALLERY_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             }
         }
     }
-
-    private Uri saveInGallery(Bitmap photo) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), photo, "Title", null);
-        return Uri.parse(path);
-    }
+*/
 
     private void signUp() {
 
@@ -362,7 +501,7 @@ public class FSignUp extends Fragment implements View.OnClickListener {
                 sLGetHallEntranceImagesDownloadUri);
 
         //FireBase work
-        new CUploadSignUpData(context, cSignUpData,uriManagerProfile, sPassword,
+        new CUploadSignUpData(context, cSignUpData, uriManagerProfile, sPassword,
                 srbHallMarquee, sManagerProfileName, sLHallEntranceImagesUri, sLHallEntranceImageNames);
     }
 
@@ -476,52 +615,32 @@ public class FSignUp extends Fragment implements View.OnClickListener {
     //Select image and set to imageView
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == IMAGE_REQUEST_CODE || requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
-                && resultCode == RESULT_OK
-                && data != null) {
+        if (resultCode == RESULT_OK) {
             if (bImageFlag) {
-                if (requestCode == IMAGE_REQUEST_CODE) {
-                    if (resultCode == RESULT_OK) {
+                if (requestCode == IMAGE_PICK_CAMERA_CODE) {
+                    if (data != null) {
 
-                        //take image from camera
-
-                        Bitmap bitmap;
-                        Bundle b = data.getExtras();
-                        assert b != null;
-                        bitmap = (Bitmap) b.getParcelable("data");
-                        assert bitmap != null;
-                        uriManagerProfile = saveInGallery(bitmap);
-
-                        //get Image Name
-                        CGetImageName objCGetImageNAme = new CGetImageName(context);
-                        sManagerProfileName = objCGetImageNAme.getImageName(uriManagerProfile);
-
-                        try {
-                            Glide.with(context).load(uriManagerProfile).into(ivManagerProfile);
-                            bImageFlag = false;
-                        } catch (Exception e) {
-                            cCustomToast.makeText(context, e.getMessage());
-                        }
+                        //got image from camera now crop it
+                        CropImage.activity(uriManagerProfile)
+                                .setGuidelines(CropImageView.Guidelines.ON) //enable image guidlines
+                                .start(getContext(), this);
 
                     } else { // Result was a failure
                         cCustomToast.makeText(context, "Picture wasn't taken!");
                     }
-                } else {
+                } else if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                     if (data.getData() != null) {
-                        uriManagerProfile = data.getData();
-                        //get Image Name
-                        CGetImageName objCGetImageNAme = new CGetImageName(context);
-                        sManagerProfileName = objCGetImageNAme.getImageName(uriManagerProfile);
 
-                        try {
-                            Glide.with(context).load(uriManagerProfile).into(ivManagerProfile);
-                            bImageFlag = false;
-                        } catch (Exception e) {
-                            cCustomToast.makeText(context, e.getMessage());
-                        }
+                        //got image from gallery now crop it
+                        CropImage.activity(data.getData())
+                                .setGuidelines(CropImageView.Guidelines.ON) //enable image guidlines
+                                .start(getContext(), this);
+                    } else { // Result was a failure
+                        cCustomToast.makeText(context, "Picture wasn't chosen!");
                     }
                 }
             } else if (data != null) {
+
                 Uri mImageUri = null;
                 if (data.getData() != null) {
 
@@ -529,6 +648,11 @@ public class FSignUp extends Fragment implements View.OnClickListener {
                     rvSignUp.setVisibility(View.VISIBLE);
 
                     mImageUri = data.getData();
+/*
+                    //got image from gallery now crop it
+                    CropImage.activity(data.getData())
+                            .setGuidelines(CropImageView.Guidelines.ON) //enable image guidlines
+                            .start(getContext(), this);*/
 
                     //get Image Name
                     CGetImageName CGetImageNAme = new CGetImageName(context);
@@ -575,6 +699,32 @@ public class FSignUp extends Fragment implements View.OnClickListener {
                 selectImagesAdapter.notifyDataSetChanged();
             }
             cCustomToast.makeText(context, "You haven't picked Image");
+        }
+
+        //get cropped image
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            if (resultCode == RESULT_OK) {
+                assert result != null;
+                uriManagerProfile = result.getUri(); //get image uri
+                //set image to image view
+
+                //get Image Name
+                CGetImageName objCGetImageNAme = new CGetImageName(context);
+                sManagerProfileName = objCGetImageNAme.getImageName(uriManagerProfile);
+                try {
+                    Glide.with(context).load(uriManagerProfile).into(ivManagerProfile);
+                    bImageFlag = false;
+                } catch (Exception e) {
+                    cCustomToast.makeText(context, e.getMessage());
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                //if there is any error show it
+                Exception error = result.getError();
+                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

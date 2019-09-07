@@ -1,5 +1,6 @@
 package com.example.mhbadmin.Notification.OfflineNotification;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -70,15 +71,13 @@ public class CSendNotification {
 
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "1")
                 .setSmallIcon(R.drawable.ic_add_picture_)
                 .setContentTitle(title)
+                .setContentText(body)
                 .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .setSound(defaultSound)
-                .setStyle(inboxStyle)
-                .setStyle(inboxStyle.addLine(body))
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -113,6 +113,7 @@ public class FRequestBookingList extends Fragment implements View.OnClickListene
 
         context = getActivity();
 
+        assert context != null;
         sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
         btnReturnToTop = (Button) fragmentView.findViewById(R.id.btn_return_to_top);
@@ -137,6 +138,7 @@ public class FRequestBookingList extends Fragment implements View.OnClickListene
     }
 
     private void removeBadges() {
+
         SharedPreferences.Editor editor = sp.edit();
         if (sRequestBookingHistory.equals("Booking Requests")) {
 
@@ -167,6 +169,8 @@ public class FRequestBookingList extends Fragment implements View.OnClickListene
 
             editor.remove(BOOKING_BADGE);
             editor.commit();
+
+            ShortcutBadger.removeCount(context);
 
             if (sp.getInt(REQUEST_BADGES, 0) != 0) {
                 int badge = sp.getInt(REQUEST_BADGES, 0);

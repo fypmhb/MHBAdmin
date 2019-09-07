@@ -1,5 +1,6 @@
 package com.example.mhbadmin.Notification.Receiving;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -104,17 +105,15 @@ public class MyFireBaseMessaging extends FirebaseMessagingService {
 
             Bitmap largeIcon = getCircleBitmap(image);
 
-            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
             assert icon != null;
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                     .setSmallIcon(Integer.parseInt(icon))
                     .setLargeIcon(largeIcon)
                     .setContentTitle(title)
+                    .setContentText(body)
                     .setAutoCancel(true)
+                    .setPriority(Notification.PRIORITY_HIGH)
                     .setSound(defaultSound)
-                    .setStyle(inboxStyle)
-                    .setStyle(inboxStyle.addLine(body))
                     .setContentIntent(pendingIntent);
 
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

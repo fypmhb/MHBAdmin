@@ -124,16 +124,17 @@ public class DashBoardActivity extends AppCompatActivity
 
     private void connectivity() {
 
+        sp = getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
+        editor = sp.edit();
 
 //      offLine dataBase
         bookingsBox = DBObjectBox.getBoxStore().boxFor(DBBookings.class);
+        //not useAble for first time but useFull for next time visit of dashBoard
         bookingsBox.removeAll();
+        editor.clear();
+        editor.commit();
 
         //FireBase work
-
-        sp = getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
-
-        editor = sp.edit();
 
         progressDialog = new ProgressDialog(this);
 

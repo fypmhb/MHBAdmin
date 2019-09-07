@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 
 import com.example.mhbadmin.Activities.DashBoardActivity;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
+import com.example.mhbadmin.Notification.APIService;
+import com.example.mhbadmin.Notification.Sending.Client;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +25,7 @@ import java.util.Calendar;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 
-public class CAcceptRequest {
+public class CCancelAcceptRequest {
 
     private Context context = null;
 
@@ -31,7 +33,10 @@ public class CAcceptRequest {
 
     private String sUserId = null,
             sHallId = null,
-            sHallMarquee = null;
+            sHallMarquee = null,
+            sRefAddress = null;
+
+    private APIService apiService = null;
 
     private boolean loopBreakFlag = false;
 
@@ -43,11 +48,12 @@ public class CAcceptRequest {
 
     private SharedPreferences sp = null;
 
-    public CAcceptRequest(Context context, boolean listActivityFlag, String sUserId, CRequestBookingData cRequestBookingData) {
+    public CCancelAcceptRequest(Context context, boolean listActivityFlag, String sUserId, CRequestBookingData cRequestBookingData, String sRefAddress) {
         this.context = context;
         this.listActivityFlag = listActivityFlag;
         this.sUserId = sUserId;
         this.cRequestBookingData = cRequestBookingData;
+        this.sRefAddress = sRefAddress;
 
         connectivity();
 
@@ -55,6 +61,9 @@ public class CAcceptRequest {
     }
 
     private void connectivity() {
+
+        apiService = Client.getClient("https://fcm.googleapis.com/")
+                .create(APIService.class);
 
         sHallId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -75,15 +84,16 @@ public class CAcceptRequest {
         if (sp.getString(META_DATA, null) != null)
             sHallMarquee = sp.getString(META_DATA, null);
 
-//        checkPreviousBookings();
-
+    /*    if (sRefAddress.equals("Accepted Requests"))
+            checkPreviousBookings();
+        else*/
         deleteBookingRequestData();
     }
 
     private void checkPreviousBookings() {
 
         final DatabaseReference databaseReference = firebaseDatabase
-                .getReference("Accepted Requests")
+                .getReference(sRefAddress)
                 .child("User Ids");
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -172,7 +182,6 @@ public class CAcceptRequest {
 
     private void deleteBookingRequestData() {
 
-
         firebaseDatabase.getReference("Booking Requests")
                 .child("User Ids")
                 .child(sUserId)
@@ -194,10 +203,9 @@ public class CAcceptRequest {
     private void addAcceptedRequestsBookingsDetail() {
 
         String sAcceptanceTiming = Calendar.getInstance().getTime().toString();
-
         cRequestBookingData.setsAcceptDeniedTiming(sAcceptanceTiming);
 
-        firebaseDatabase.getReference("Accepted Requests")
+        firebaseDatabase.getReference(sRefAddress)
                 .child("User Ids")
                 .child(sUserId)
                 .child(sHallMarquee + " Ids")
@@ -210,11 +218,63 @@ public class CAcceptRequest {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        intentToNextActivity();
+                        // sendNotification();
                     }
                 });
     }
 
+
+    /*private void sendNotification() {
+
+        firebaseDatabase.getReference("Tokens")
+                .child(sHallId)
+                .child("token")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+
+                            String sToken = dataSnapshot.getValue(String.class);
+                            Token token = new Token(sToken);
+
+                            Data data = new Data(sUserId, R.drawable.ic_add_picture_,
+                                    userData.getsUserFirstName() + " " + userData.getsUserLastName(),
+                                    cRequestBookingData.getsFunctionDate() + " " + cRequestBookingData.getsFunctionTiming(),
+                                    sHallId, cRequestBookingData.getsSubHallId(), new Gson().toJson(userData),
+                                    new Gson().toJson(cRequestBookingData));
+
+                            Sender sender = new Sender(data, token.getToken());
+
+                            apiService.sendNotification(sender)
+                                    .enqueue(new Callback<MyResponse>() {
+                                        @Override
+                                        public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
+                                            if (response.code() == 200) {
+                                                assert response.body() != null;
+                                                if (response.body().success != 1) {
+                                                    Toast.makeText(context, "Notification not sent", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Toast.makeText(context, "Notification Sent", Toast.LENGTH_SHORT).show();
+                                                    intentToNextActivity();
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(@NonNull Call<MyResponse> call, Throwable t) {
+
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+*/
     private void intentToNextActivity() {
 
         if (listActivityFlag) {
