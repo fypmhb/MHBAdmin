@@ -42,7 +42,8 @@ public class SelectImagesAdapter extends RecyclerView.Adapter<SelectImagesAdapte
     @Override
     public void onBindViewHolder(@NonNull final SelectImagesAdapter.MyViewHolder holder, final int position) {
         try {
-            Glide.with(context).load(lImages.get(position)).into(holder.ivEntranceImages);
+            Glide.with(context).load(lImages.get(position))
+                    .placeholder(R.drawable.ic_loading_image).into(holder.ivEntranceImages);
         } catch (Exception e) {
             e.printStackTrace();
         }

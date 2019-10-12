@@ -62,6 +62,7 @@ public class CDeleteSubHall {
         progressDialog = new ProgressDialog(context);
 
         this.sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
+
         if (sp.getString(META_DATA, null) != null)
             this.sHallMarquee = sp.getString(META_DATA, null);
 
@@ -96,7 +97,7 @@ public class CDeleteSubHall {
                         String sClientId = dataSnapshot1.getKey();
                         assert sClientId != null;
                         databaseReference.child(sClientId)
-                                .child("Hall Ids")
+                                .child(sHallMarquee + " Ids")
                                 .child(userId)
                                 .child("Sub Hall Ids")
                                 .child(sSubHallDocumentId)
@@ -190,7 +191,7 @@ public class CDeleteSubHall {
                         String sClientId = dataSnapshot1.getKey();
                         assert sClientId != null;
                         databaseReference.child(sClientId)
-                                .child("Hall Ids")
+                                .child(sHallMarquee + " Ids")
                                 .child(userId)
                                 .child("Sub Hall Ids")
                                 .child(sSubHallDocumentId)
@@ -228,13 +229,21 @@ public class CDeleteSubHall {
                             SharedPreferences.Editor editor = sp.edit();
 
                             //remove Deleted Sub Hall From Shared Preferences
+
                             editor.remove(sSubHallDocumentId + subHallCounter);
                             editor.remove(sSubHallObjectId + subHallCounter);
                             editor.remove("sSubHallObject" + subHallCounter);
 
-
-                            editor.putInt(SUB_HALL_COUNTER, subHallCounter);
-                            editor.commit();
+                            if (subHallCounter != 0) {
+                                editor.putInt(SUB_HALL_COUNTER, subHallCounter);
+                                editor.commit();
+                            } else {
+                                firebaseDatabase
+                                        .getReference(sHallMarquee)
+                                        .child(userId)
+                                        .child("Sub Hall Counter")
+                                        .removeValue();
+                            }
 
                             if (deleteSubHallHallFlag)
                                 context.startActivity(new Intent(context, DashBoardActivity.class));

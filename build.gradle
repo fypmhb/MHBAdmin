@@ -1,14 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    //SQLite Abstract layer
+    ext.objectboxVersion = '2.3.4'
     repositories {
         google()
         jcenter()
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.google.gms:google-services:4.3.2'
+
+        //SQLite Abstract layer
+        classpath "io.objectbox:objectbox-gradle-plugin:$objectboxVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -20,10 +25,7 @@ allprojects {
         mavenCentral()
         google()
         jcenter()
-        maven { url 'https://jitpack.io' }
-        maven {
-            url 'https://maven.google.com'
-        }
+        maven { url 'https://www.jitpack.io' }
     }
 }
 

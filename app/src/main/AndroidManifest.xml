@@ -42,12 +42,8 @@
         <activity android:name=".Activities.UserDetailActivity" />
 
         <activity
-            android:name=".Activities.FragmentRelated.HistoryActivity"
-            android:parentActivityName=".Activities.DashBoardActivity" />
-
-        <activity
             android:name=".Activities.RequestBookingDetailActivity"
-            android:parentActivityName=".Activities.FragmentRelated.RequestBookingListActivity" />
+            android:parentActivityName=".Activities.FragmentRelated.RequestBookingHistoryListActivity" />
 
         <activity
             android:name=".Activities.FragmentRelated.ShowDeleteSubHallActivity"
@@ -76,7 +72,7 @@
         <activity android:name=".Activities.AddSubHallActivity" />
 
         <activity
-            android:name=".Activities.FragmentRelated.RequestBookingListActivity"
+            android:name=".Activities.FragmentRelated.RequestBookingHistoryListActivity"
             android:parentActivityName=".Activities.DashBoardActivity" />
 
         <activity

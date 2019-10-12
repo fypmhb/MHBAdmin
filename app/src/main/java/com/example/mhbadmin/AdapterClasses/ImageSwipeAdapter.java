@@ -46,7 +46,8 @@ public class ImageSwipeAdapter extends PagerAdapter {
         ImageView imageView = item_view.findViewById(R.id.iv_swipe_image_view);
         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
 
-        Glide.with(context).load(image_resources.get(position)).into(imageView);
+        Glide.with(context).load(image_resources.get(position))
+                .placeholder(R.drawable.ic_loading_image).into(imageView);
         container.addView(item_view);
         return item_view;
 

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/_100sdp"
+    android:layout_height="@dimen/_150sdp"
     android:layout_margin="@dimen/_5sdp"
     android:background="@drawable/round_white"
     android:padding="@dimen/_5sdp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/_5sdp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_user_profile"
             android:layout_width="@dimen/_120sdp"
             android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/_10sdp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_loading_image" />
 
@@ -25,9 +26,25 @@
             android:layout_marginStart="@dimen/_5sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_toEndOf="@id/iv_user_profile"
-            android:hint="abc"
+            android:hint="xyz"
             android:padding="@dimen/_2sdp"
-            android:textSize="@dimen/_10ssp" />
+            android:textSize="@dimen/_20ssp" />
+
+        <TextView
+            android:id="@+id/tv_success_denied"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:background="@color/colorPrimaryDark"
+            android:hint="abc"
+            android:padding="@dimen/_3sdp"
+            android:textAlignment="center"
+            android:textColor="@color/whiteColor"
+            android:textSize="@dimen/_20ssp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_user_phone_no"
@@ -39,7 +56,7 @@
             android:layout_toEndOf="@id/iv_user_profile"
             android:hint="xxxxxxxxxx"
             android:padding="@dimen/_2sdp"
-            android:textSize="@dimen/_10ssp" />
+            android:textSize="@dimen/_20ssp" />
 
         <TextView
             android:id="@+id/tv_booking_request_cancel_accept_time_date"
@@ -51,7 +68,7 @@
             android:layout_toEndOf="@id/iv_user_profile"
             android:hint="02:09 PM 22\3\18"
             android:padding="@dimen/_2sdp"
-            android:textSize="@dimen/_10ssp" />
+            android:textSize="@dimen/_20ssp" />
 
         <TextView
             android:id="@+id/tv_user_location"
@@ -64,7 +81,7 @@
             android:hint="02:09 PM 22\3\18"
             android:maxLines="2"
             android:padding="@dimen/_2sdp"
-            android:textSize="@dimen/_10ssp"
+            android:textSize="@dimen/_20ssp"
             android:visibility="gone" />
 
         <LinearLayout
@@ -84,7 +101,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Cancel"
-                android:textSize="@dimen/_10ssp" />
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_20ssp" />
 
             <ImageView
                 android:id="@+id/iv_cancel"
@@ -100,7 +118,8 @@
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_weight="1"
                 android:text="Accept"
-                android:textSize="@dimen/_10ssp" />
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/_20ssp" />
 
             <ImageView
                 android:id="@+id/iv_accept"

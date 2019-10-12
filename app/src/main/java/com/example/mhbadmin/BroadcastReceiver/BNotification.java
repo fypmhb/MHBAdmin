@@ -31,7 +31,8 @@ public class BNotification extends BroadcastReceiver {
         String sDate = dateFormat.format(currentDate);
 
         //offLine dataBase
-        Box<DBBookings> bookingsBox = DBObjectBox.getBoxStore().boxFor(DBBookings.class);
+        Box<DBBookings> bookingsBox = DBObjectBox.getBoxStore()
+                .boxFor(DBBookings.class);
 
         List<DBBookings> dbBookingsList = bookingsBox.query()
                 .equal(DBBookings_.sFunctionDate, sDate)

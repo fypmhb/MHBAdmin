@@ -149,7 +149,8 @@ public class FShowDeleteSubHall extends Fragment implements View.OnClickListener
 
     private void showDataOnView() {
 
-        ImageSwipeAdapter imageSwipeAdapter = new ImageSwipeAdapter(getActivity(), cSubHallData.getsLGetAddHallImagesDownloadUri());
+        ImageSwipeAdapter imageSwipeAdapter = new ImageSwipeAdapter(getActivity(),
+                cSubHallData.getsLGetAddHallImagesDownloadUri());
         imageViewPager.setAdapter(imageSwipeAdapter);
 
         Timer timer = new Timer();

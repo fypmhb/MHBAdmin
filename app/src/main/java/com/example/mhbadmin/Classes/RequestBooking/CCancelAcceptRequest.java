@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,11 @@ import com.example.mhbadmin.Activities.DashBoardActivity;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Notification.APIService;
 import com.example.mhbadmin.Notification.Sending.Client;
+import com.example.mhbadmin.Notification.Sending.Data;
+import com.example.mhbadmin.Notification.Sending.MyResponse;
+import com.example.mhbadmin.Notification.Sending.Sender;
+import com.example.mhbadmin.Notification.Token;
+import com.example.mhbadmin.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,8 +26,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.util.Calendar;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 
@@ -84,10 +95,10 @@ public class CCancelAcceptRequest {
         if (sp.getString(META_DATA, null) != null)
             sHallMarquee = sp.getString(META_DATA, null);
 
-    /*    if (sRefAddress.equals("Accepted Requests"))
+        if (sRefAddress.equals("Accepted Requests"))
             checkPreviousBookings();
-        else*/
-        deleteBookingRequestData();
+        else
+            deleteBookingRequestData();
     }
 
     private void checkPreviousBookings() {
@@ -166,9 +177,13 @@ public class CCancelAcceptRequest {
                             }
                         });
                     }
-                    Toast.makeText(context, "" + loopBreakFlag, Toast.LENGTH_SHORT).show();
-                    if (!loopBreakFlag)
-                        deleteBookingRequestData();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!loopBreakFlag)
+                                deleteBookingRequestData();
+                        }
+                    }, 5000);
                 } else {
                     deleteBookingRequestData();
                 }
@@ -195,12 +210,12 @@ public class CCancelAcceptRequest {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        addAcceptedRequestsBookingsDetail();
+                        addAcceptedCancelDetail();
                     }
                 });
     }
 
-    private void addAcceptedRequestsBookingsDetail() {
+    private void addAcceptedCancelDetail() {
 
         String sAcceptanceTiming = Calendar.getInstance().getTime().toString();
         cRequestBookingData.setsAcceptDeniedTiming(sAcceptanceTiming);
@@ -218,13 +233,13 @@ public class CCancelAcceptRequest {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        // sendNotification();
+                        sendNotification();
                     }
                 });
     }
 
 
-    /*private void sendNotification() {
+    private void sendNotification() {
 
         firebaseDatabase.getReference("Tokens")
                 .child(sHallId)
@@ -237,10 +252,14 @@ public class CCancelAcceptRequest {
                             String sToken = dataSnapshot.getValue(String.class);
                             Token token = new Token(sToken);
 
-                            Data data = new Data(sUserId, R.drawable.ic_add_picture_,
-                                    userData.getsUserFirstName() + " " + userData.getsUserLastName(),
-                                    cRequestBookingData.getsFunctionDate() + " " + cRequestBookingData.getsFunctionTiming(),
-                                    sHallId, cRequestBookingData.getsSubHallId(), new Gson().toJson(userData),
+                            String sTitle = null;
+                            if (sRefAddress.equals("Canceled Requests"))
+                                sTitle = "Request Denied";
+                            else if (sRefAddress.equals("Accepted Requests"))
+                                sTitle = "Request Accepted";
+                            Data data = new Data(sHallId, R.drawable.ic_add_picture_, sTitle,
+                                    cRequestBookingData.getsFunctionTiming() + " " + cRequestBookingData.getsFunctionDate(),
+                                    sUserId, cRequestBookingData.getsSubHallId(), new Gson().toJson(userData),
                                     new Gson().toJson(cRequestBookingData));
 
                             Sender sender = new Sender(data, token.getToken());
@@ -274,7 +293,7 @@ public class CCancelAcceptRequest {
                     }
                 });
     }
-*/
+
     private void intentToNextActivity() {
 
         if (listActivityFlag) {

@@ -25,9 +25,9 @@ public class RequestBookingFilter extends Filter {
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
         FilterResults results = new FilterResults();
-        FilterLists filterLists1=null;
-        CRequestBookingData cRequestBookingData=null;
-        CUserData cUserData=null;
+        FilterLists filterLists1 = null;
+        CRequestBookingData cRequestBookingData = null;
+        CUserData cUserData = null;
 
         //CHECK CONSTRAINT VALIDITY
         if (constraint != null && constraint.length() > 0) {
@@ -38,13 +38,15 @@ public class RequestBookingFilter extends Filter {
             ArrayList<FilterLists> filteredPlayers = new ArrayList<>();
             for (int i = 0; i < filterLists.size(); i++) {
 
-                filterLists1=filterLists.get(i);
+                filterLists1 = filterLists.get(i);
 
-                cRequestBookingData=filterLists1.getcRequestBookingDataList();
-                cUserData=filterLists1.getcUserDataList();
+                cRequestBookingData = filterLists1.getcRequestBookingDataList();
+                cUserData = filterLists1.getcUserDataList();
 
                 //CHECK
-                if (cUserData.getsCity().toLowerCase().contains(constraint) ||
+                if ((filterLists1.getsActivityName() != null &&
+                        filterLists1.getsActivityName().toLowerCase().contains(constraint)) ||
+                        cUserData.getsCity().toLowerCase().contains(constraint) ||
                         cUserData.getsLocation().toLowerCase().contains(constraint) ||
                         cUserData.getsUserFirstName().toLowerCase().contains(constraint) ||
                         cUserData.getsUserLastName().toLowerCase().contains(constraint) ||

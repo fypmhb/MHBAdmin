@@ -50,7 +50,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
     @NonNull
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.layout_request_booking, parent, false);
+                .inflate(R.layout.layout_request_booking_history, parent, false);
         return new MyViewHolder(v);
     }
 
@@ -71,7 +71,8 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
         CUserData cUserData = filterLists1.getcUserDataList();
         CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
 
-        Glide.with(context).load(cUserData.getsUserProfileImageUri()).into(holder.ivUserProfile);
+        Glide.with(context).load(cUserData.getsUserProfileImageUri())
+                .placeholder(R.drawable.ic_loading_image).into(holder.ivUserProfile);
         holder.tvUserName.setText(cUserData.getsUserFirstName() + " " + cUserData.getsUserLastName());
         holder.tvPhoneNo.setText(cUserData.getsPhoneNo());
         holder.tvRequestTimeDate.setText(cRequestBookingData.getsFunctionTiming()
@@ -85,6 +86,11 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
 
             holder.tvUserLocation.setVisibility(View.VISIBLE);
             holder.tvUserLocation.setText(cUserData.getsLocation());
+        }
+
+        if (sActivityName.equals("Succeed Requests") || sActivityName.equals("Canceled Requests")) {
+            holder.tvSuccessDenied.setVisibility(View.VISIBLE);
+            holder.tvSuccessDenied.setText(filterLists1.getsActivityName());
         }
     }
 
@@ -102,7 +108,8 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
                 tvCancel = null,
                 tvAccept = null,
         //below textView is hidden
-        tvUserLocation = null;
+        tvUserLocation = null,
+                tvSuccessDenied = null;
 
         private ImageView ivAccept = null,
                 ivCancel = null;
@@ -115,17 +122,12 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             //setting click listener on cardView
             ivUserProfile.setOnClickListener(this);
             tvUserName.setOnClickListener(this);
+            tvSuccessDenied.setOnClickListener(this);
             tvPhoneNo.setOnClickListener(this);
             tvRequestTimeDate.setOnClickListener(this);
+            tvUserLocation.setOnClickListener(this);
             tvCancel.setOnClickListener(this);
             tvAccept.setOnClickListener(this);
-
-            tvUserLocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    intentToNextActivity(getAdapterPosition());
-                }
-            });
         }
 
         private void connectivity(View itemView) {
@@ -137,6 +139,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             tvAccept = (TextView) itemView.findViewById(R.id.tv_accept);
             //below textView is hidden
             tvUserLocation = (TextView) itemView.findViewById(R.id.tv_user_location);
+            tvSuccessDenied = (TextView) itemView.findViewById(R.id.tv_success_denied);
 
             ivAccept = (ImageView) itemView.findViewById(R.id.iv_accept);
             ivCancel = (ImageView) itemView.findViewById(R.id.iv_cancel);
@@ -149,34 +152,18 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
                 showDetailDialog(getAdapterPosition());
             else if (v.getId() == R.id.tv_user_name)
                 intentToNextActivity(getAdapterPosition());
+            else if ((v.getId() == R.id.tv_success_denied))
+                intentToNextActivity(getAdapterPosition());
             else if (v.getId() == R.id.tv_user_phone_no)
+                intentToNextActivity(getAdapterPosition());
+            else if (v.getId() == R.id.tv_user_location)
                 intentToNextActivity(getAdapterPosition());
             else if (v.getId() == R.id.tv_booking_request_cancel_accept_time_date)
                 intentToNextActivity(getAdapterPosition());
             else if (v.getId() == R.id.tv_cancel) {
-
-                //check Internet Connection
-                if (!checkInternetConnection()) {
-                    return;
-                }
-
-                FilterLists filterLists1 = filterLists.get(getAdapterPosition());
-
-                CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
-
-                new CCancelAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData, "Canceled Requests");
+                cancelAcceptRequests("Canceled Requests");
             } else if (v.getId() == R.id.tv_accept) {
-
-                //check Internet Connection
-                if (!checkInternetConnection()) {
-                    return;
-                }
-
-                FilterLists filterLists1 = filterLists.get(getAdapterPosition());
-
-                CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
-
-                new CCancelAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData, "Accepted Requests");
+                cancelAcceptRequests("Accepted Requests");
             } else if (v.getId() == R.id.tv_user_location)
                 intentToNextActivity(getAdapterPosition());
         }
@@ -191,7 +178,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-            View alertView = LayoutInflater.from(context).inflate(R.layout.layout_detail, null);
+            View alertView = LayoutInflater.from(context).inflate(R.layout.layout_user_detail, null);
 
             builder.setView(alertView);
 
@@ -210,6 +197,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             Glide.with(context)
                     .load(filterLists.get(position)
                             .getcUserDataList().getsUserProfileImageUri())
+.placeholder(R.drawable.ic_loading_image)
                     .into(ivUserProfile);
 
             btnMessage.setOnClickListener(new View.OnClickListener() {
@@ -252,6 +240,19 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             });
         }
 
+        private void cancelAcceptRequests(String sActivityName) {
+            //check Internet Connection
+            if (!checkInternetConnection()) {
+                return;
+            }
+
+            FilterLists filterLists1 = filterLists.get(getAdapterPosition());
+
+            CRequestBookingData cRequestBookingData = filterLists1.getcRequestBookingDataList();
+
+            new CCancelAcceptRequest(context, true, filterLists1.getcUserDataList().getsUserID(), cRequestBookingData, sActivityName);
+        }
+
         private boolean checkInternetConnection() {
             // if there is no internet connection
             CNetworkConnection CNetworkConnection = new CNetworkConnection();
@@ -276,7 +277,12 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
 
             Bundle bundle = new Bundle();
 
-            bundle.putString("sActivityName", sActivityName);
+            if (filterLists1.getsActivityName() != null &&
+                    filterLists1.getsActivityName().equals("Succeed Bookings"))
+                bundle.putString("sActivityName", "Succeed Bookings");
+            else
+                bundle.putString("sActivityName", sActivityName);
+
             bundle.putString("userData", userData);
             bundle.putString("requestBookingData", requestBookingData);
 

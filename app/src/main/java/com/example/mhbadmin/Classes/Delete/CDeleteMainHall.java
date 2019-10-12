@@ -197,7 +197,7 @@ class CDeleteMainHall {
 
                         assert sClientId != null;
                         databaseReference.child(sClientId)
-                                .child("Hall Ids")
+                                .child(sHallMarquee+" Ids")
                                 .child(userId)
                                 .removeValue();
                     }

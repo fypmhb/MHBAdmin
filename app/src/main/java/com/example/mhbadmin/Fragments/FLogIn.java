@@ -157,7 +157,7 @@ public class FLogIn extends Fragment implements View.OnClickListener {
             return;
         }
 
-        logInHallToFireBase();
+        logInHallMarqueeToFireBase();
     }
 
     private boolean allValidation() {
@@ -188,7 +188,7 @@ public class FLogIn extends Fragment implements View.OnClickListener {
         return true;
     }
 
-    private void logInHallToFireBase() {
+    private void logInHallMarqueeToFireBase() {
 
         progressDialog.setMessage("Login...");
         progressDialog.show();

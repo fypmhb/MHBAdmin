@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import static com.example.mhbadmin.Activities.DashBoardActivity.META_DATA;
 import static com.example.mhbadmin.Activities.DashBoardActivity.SUB_HALL_COUNTER;
 
 public class CDeleteEntireHall {
@@ -38,7 +39,8 @@ public class CDeleteEntireHall {
 
     private String sSubHallDocumentId = null,
             getsSubHallObjectId = null,
-            getsSubHallObject = null;
+            getsSubHallObject = null,
+            sHallMarquee = null;
 
     public CDeleteEntireHall(Context context) {
 
@@ -65,6 +67,9 @@ public class CDeleteEntireHall {
 
         if (sp.getInt(SUB_HALL_COUNTER, 0) != 0)
             noOfTabs = sp.getInt(SUB_HALL_COUNTER, 0);
+
+        if (sp.getString(META_DATA, null) != null)
+            this.sHallMarquee = sp.getString(META_DATA, null);
 
         checkBookings();
     }
@@ -118,7 +123,7 @@ public class CDeleteEntireHall {
                             String sClientId = dataSnapshot1.getKey();
                             assert sClientId != null;
                             databaseReference.child(sClientId)
-                                    .child("Hall Ids")
+                                    .child(sHallMarquee+" Ids")
                                     .child(userId)
                                     .child("Sub Hall Ids")
                                     .child(sSubHallDocumentId)

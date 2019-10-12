@@ -23,8 +23,7 @@ import androidx.core.view.GravityCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
-import com.example.mhbadmin.Activities.FragmentRelated.HistoryActivity;
-import com.example.mhbadmin.Activities.FragmentRelated.RequestBookingListActivity;
+import com.example.mhbadmin.Activities.FragmentRelated.RequestBookingHistoryListActivity;
 import com.example.mhbadmin.Activities.FragmentRelated.ShowDeleteSubHallActivity;
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
 import com.example.mhbadmin.BroadcastReceiver.BNotification;
@@ -55,6 +54,7 @@ import io.objectbox.Box;
 
 public class DashBoardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
     public static final String S_SUB_HALL_DOCUMENT_ID = "S_SUB_HALL_DOCUMENT_ID";
     public static final String S_SUB_HALL_OBJECT = "S_SUB_HALL_OBJECT";
     public static final String REQUEST_BADGES = "REQUEST_BADGES";
@@ -71,9 +71,17 @@ public class DashBoardActivity extends AppCompatActivity
     private ImageView ivManagerProfile = null;
     private TextView tvHallMarqueeName = null,
             tvManagerName = null,
-            tvHallsMarquees = null,
-            tvAveragePerHeadRate = null,
-            tvLocation = null,
+            tvHallMarqueeEmail = null,
+            tvChangeHallMarqueeEmail = null,
+            tvHallMarqueePhoneNo = null,
+            tvHallMarqueeCity = null,
+            tvChangeHallMarqueeCity = null,
+            tvHallMarqueeLocation = null,
+            tvChangeHallMarqueeLocation = null,
+            tvSpotLights = null,
+            tvMusic = null,
+            tvACHeater = null,
+            tvParking = null,
             tvNavigationDashBoardHallMarqueeName = null;
 
     //FireBase Work
@@ -145,9 +153,17 @@ public class DashBoardActivity extends AppCompatActivity
         ivManagerProfile = (ImageView) findViewById(R.id.iv_manager_profile);
         tvHallMarqueeName = (TextView) findViewById(R.id.tv_hall_marquee_name);
         tvManagerName = (TextView) findViewById(R.id.tv_manager_name);
-        tvHallsMarquees = (TextView) findViewById(R.id.tv_halls_marquees);
-        tvAveragePerHeadRate = (TextView) findViewById(R.id.tv_average_per_head_rate);
-        tvLocation = (TextView) findViewById(R.id.tv_location);
+        tvHallMarqueeEmail = (TextView) findViewById(R.id.tv_hall_marquee_email);
+        tvChangeHallMarqueeEmail = (TextView) findViewById(R.id.tv_change_hall_marquee_email);
+        tvHallMarqueePhoneNo = (TextView) findViewById(R.id.tv_hall_marquee_phone_no);
+        tvHallMarqueeCity = (TextView) findViewById(R.id.tv_hall_marquee_city);
+        tvChangeHallMarqueeCity = (TextView) findViewById(R.id.tv_change_hall_marquee_city);
+        tvHallMarqueeLocation = (TextView) findViewById(R.id.tv_hall_marquee_location);
+        tvChangeHallMarqueeLocation = (TextView) findViewById(R.id.tv_change_hall_marquee_location);
+        tvSpotLights = (TextView) findViewById(R.id.tv_spotlights);
+        tvMusic = (TextView) findViewById(R.id.tv_music);
+        tvACHeater = (TextView) findViewById(R.id.tv_ac_heater);
+        tvParking = (TextView) findViewById(R.id.tv_parking);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawer = (CardDrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,9 +184,7 @@ public class DashBoardActivity extends AppCompatActivity
         //Notification
         updateToken(FirebaseInstanceId.getInstance().getToken());
 
-        //for offline notification
-        getBookingsDataFromFireBase();
-
+        checkFireBaseState();
     }
 
     private boolean checkInternetConnection() {
@@ -190,12 +204,46 @@ public class DashBoardActivity extends AppCompatActivity
                 setValue(token1);
     }
 
-    private void getBookingsDataFromFireBase() {
+    private void checkFireBaseState() {
 
         progressDialog.setMessage("Loading...");
         progressDialog.show();
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false);
+
+        firebaseDatabase.getReference("Meta Data")
+                .child(userId)
+                .child("meta data")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+
+                            sHallMarquee = dataSnapshot.getValue(String.class);
+
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putString(META_DATA, sHallMarquee);
+                            editor.commit();
+
+                            setView();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void setView() {
+        tvChangeHallMarqueeEmail.setText(sHallMarquee+" Email");
+        tvChangeHallMarqueeCity.setText(sHallMarquee+" City");
+        tvChangeHallMarqueeLocation.setText(sHallMarquee+" Location");
+        getBookingsDataFromFireBase();
+    }
+
+    private void getBookingsDataFromFireBase() {
 
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference("Accepted Requests")
@@ -223,7 +271,7 @@ public class DashBoardActivity extends AppCompatActivity
 
                                             final DatabaseReference databaseReference1 = databaseReference
                                                     .child(sClient)
-                                                    .child("Hall Ids")
+                                                    .child(sHallMarquee + " Ids")
                                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                                     .child("Sub Hall Ids");
 
@@ -248,13 +296,16 @@ public class DashBoardActivity extends AppCompatActivity
                                                                     if (dataSnapshot.exists()) {
 
                                                                         for (DataSnapshot dataSnapshot3 : dataSnapshot.getChildren()) {
+
                                                                             final String sTiming = dataSnapshot3.getKey();
 
                                                                             assert sTiming != null;
-                                                                            databaseReference2.child(sTiming)
+                                                                            databaseReference2
+                                                                                    .child(sTiming)
                                                                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                         @Override
                                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                                                                                             if (dataSnapshot.exists()) {
 
                                                                                                 CRequestBookingData cRequestBookingData = dataSnapshot.getValue(CRequestBookingData.class);
@@ -278,7 +329,8 @@ public class DashBoardActivity extends AppCompatActivity
                                                                                                 bookingsBox.put(dbBookings);
 
                                                                                                 progressDialog.dismiss();
-                                                                                                checkFireBaseState();
+
+                                                                                                getDataFromFireBase();
                                                                                             }
                                                                                         }
 
@@ -301,7 +353,7 @@ public class DashBoardActivity extends AppCompatActivity
                                                     } else {
                                                         //FireBase Work
                                                         progressDialog.dismiss();
-                                                        checkFireBaseState();
+                                                        getDataFromFireBase();
                                                     }
                                                 }
 
@@ -321,7 +373,7 @@ public class DashBoardActivity extends AppCompatActivity
                     }
                 } else {//FireBase Work
                     progressDialog.dismiss();
-                    checkFireBaseState();
+                    getDataFromFireBase();
                 }
             }
 
@@ -331,34 +383,6 @@ public class DashBoardActivity extends AppCompatActivity
 
             }
         });
-
-    }
-
-    private void checkFireBaseState() {
-
-        firebaseDatabase.getReference("Meta Data")
-                .child(userId)
-                .child("meta data")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-
-                            sHallMarquee = dataSnapshot.getValue(String.class);
-
-                            SharedPreferences.Editor editor = sp.edit();
-                            editor.putString(META_DATA, sHallMarquee);
-                            editor.commit();
-
-                            getDataFromFireBase();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
     }
 
     private void getDataFromFireBase() {
@@ -418,7 +442,6 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
     private void getSubHallDocumentIdAndSubHallObject() {
-
 
         final DatabaseReference databaseReference = firebaseDatabase
                 .getReference(sHallMarquee)
@@ -489,8 +512,14 @@ public class DashBoardActivity extends AppCompatActivity
         tvNavigationDashBoardHallMarqueeName.setText(sHallMarqueeName);
         String sManagerName = cSignUpData.getsManagerFirstName() + " " + cSignUpData.getsManagerLastName();
         tvManagerName.setText(sManagerName);
-        //find average Per head
-        tvLocation.setText(cSignUpData.getsLocation());
+        tvHallMarqueeEmail.setText(cSignUpData.getsEmail());
+        tvHallMarqueePhoneNo.setText(cSignUpData.getsPhoneNo());
+        tvHallMarqueeCity.setText(cSignUpData.getsCity());
+        tvHallMarqueeLocation.setText(cSignUpData.getsLocation());
+        tvSpotLights.setText(cSignUpData.getsSpotLights());
+        tvMusic.setText(cSignUpData.getsMusic());
+        tvACHeater.setText(cSignUpData.getsAc_Heater());
+        tvParking.setText(cSignUpData.getsParking());
 
         progressDialog.dismiss();
     }
@@ -554,16 +583,20 @@ public class DashBoardActivity extends AppCompatActivity
             SharedPreferences.Editor editor = sp.edit();
             editor.putString("sRequestBookingHistory", "Booking Requests");
             editor.commit();
-            startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
+            startActivity(new Intent(getApplicationContext(), RequestBookingHistoryListActivity.class));
         } else if (id == R.id.nav_bookings) {
             navigationFlag = false;
             SharedPreferences.Editor editor = sp.edit();
             editor.putString("sRequestBookingHistory", "Accepted Requests");
             editor.commit();
-            startActivity(new Intent(getApplicationContext(), RequestBookingListActivity.class));
+            startActivity(new Intent(getApplicationContext(), RequestBookingHistoryListActivity.class));
         } else if (id == R.id.nav_history) {
             navigationFlag = false;
-            startActivity(new Intent(getApplicationContext(), HistoryActivity.class));
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("sRequestBookingHistory", "Canceled Requests");
+            editor.putString("sHistoryAcceptedRequests", "Succeed Requests");
+            editor.commit();
+            startActivity(new Intent(getApplicationContext(), RequestBookingHistoryListActivity.class));
         } else if (id == R.id.nav_log_out) {
             logOut();
         } else if (id == R.id.nav_settings) {

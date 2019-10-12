@@ -353,11 +353,6 @@ public class AddSubHallActivity extends AppCompatActivity implements View.OnClic
         return true;
     }
 
-    private void checkFireBaseState() {
-
-
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Uri mImageUri = null;

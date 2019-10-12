@@ -125,7 +125,7 @@ public class RequestBookingDetailActivity extends AppCompatActivity implements V
 
                 setVisibilityOfTextViews();
                 break;
-            case "Denied Bookings":
+            case "Canceled Requests":
                 tvBookingRequestCancelAcceptTiming.setText("Denied Timing");
 
                 setVisibilityOfTextViews();

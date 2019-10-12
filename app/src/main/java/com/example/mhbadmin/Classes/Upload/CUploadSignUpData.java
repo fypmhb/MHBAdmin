@@ -253,8 +253,7 @@ public class CUploadSignUpData {
         progressDialog.setCanceledOnTouchOutside(false);
 
 
-        firebaseDatabase
-                .getReference(srbHallMarquee)
+        firebaseDatabase.getReference(srbHallMarquee)
                 .child(userId)
                 .child(srbHallMarquee + " info")
                 .setValue(cSignUpData)

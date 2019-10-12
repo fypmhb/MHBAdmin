@@ -13,13 +13,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.mhbadmin.Fragments.FRequestBookingList;
+import com.example.mhbadmin.Classes.Models.CSubHallData;
+import com.example.mhbadmin.Fragments.FRequestBookingHistoryList;
 import com.example.mhbadmin.R;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.SUB_HALL_COUNTER;
 
-public class RequestBookingListActivity extends AppCompatActivity {
+public class RequestBookingHistoryListActivity extends AppCompatActivity {
 
     private TabLayout tabLayout = null;
     private ViewPager tabsViewPager = null;
@@ -33,7 +35,7 @@ public class RequestBookingListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_request_booking_list);
+        setContentView(R.layout.activity_request_booking_history_list);
 
         connectivity();
 
@@ -66,8 +68,7 @@ public class RequestBookingListActivity extends AppCompatActivity {
         if (sp.getInt(SUB_HALL_COUNTER, 0) != 0) {
             int noOfTabs = sp.getInt(SUB_HALL_COUNTER, 0);
             setActivityHallMarqueeDetail(noOfTabs);
-        }
-        else {
+        } else {
             Toast.makeText(this, "Please add sub hall", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         }
@@ -77,7 +78,7 @@ public class RequestBookingListActivity extends AppCompatActivity {
 
         progressDialog.dismiss();
 
-        RequestBookingListActivity.ViewPagerAdapter viewPagerAdapter = new RequestBookingListActivity.ViewPagerAdapter(getSupportFragmentManager(), noOfTabs);
+        RequestBookingHistoryListActivity.ViewPagerAdapter viewPagerAdapter = new RequestBookingHistoryListActivity.ViewPagerAdapter(getSupportFragmentManager(), noOfTabs);
         tabsViewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(tabsViewPager);
     }
@@ -88,14 +89,13 @@ public class RequestBookingListActivity extends AppCompatActivity {
 
 
         ViewPagerAdapter(FragmentManager fm, int noOfItems) {
-            super(fm);
+            super(fm,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             this.noOfItems = noOfItems;
         }
 
         @NonNull
-        @Override
         public Fragment getItem(int position) {
-            return FRequestBookingList.newInstance(sp.getString("sSubHallDocumentId" + (position + 1), null));
+            return FRequestBookingHistoryList.newInstance(sp.getString("sSubHallDocumentId" + (position + 1), null));
         }
 
         @Override
@@ -105,7 +105,9 @@ public class RequestBookingListActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Sub Hall " + (position + 1);
+            String sSubHallObject = sp.getString("sSubHallObject" + (position + 1), null);
+            CSubHallData subHallObject = new Gson().fromJson(sSubHallObject, CSubHallData.class);
+            return subHallObject.getsSubHallName();
         }
     }
 }

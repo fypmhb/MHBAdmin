@@ -57,11 +57,11 @@ import static android.app.Activity.RESULT_OK;
 
 public class FSignUp extends Fragment implements View.OnClickListener {
 
-    private static final int CAMERA_REQUEST_CODE = 100;
-    private static final int STORAGE_REQUEST_CODE = 200;
+    public static final int CAMERA_REQUEST_CODE = 100;
+    public static final int STORAGE_REQUEST_CODE = 200;
     public static final int IMAGE_PICK_GALLERY_CODE = 300;
-    private static final int IMAGE_PICK_CAMERA_CODE = 400;
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 120;
+    public static final int IMAGE_PICK_CAMERA_CODE = 400;
+    public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 120;
 
     private Context context = null;
     private View fragmentView = null;
@@ -275,7 +275,7 @@ public class FSignUp extends Fragment implements View.OnClickListener {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    //single ot Multiple Image Selection Flag
+    //single or Multiple Image Selection Flag
     //flag is true for multiple images selection
     private void intentForOpenGallery(boolean flag) {
         if (flag) {
@@ -409,78 +409,10 @@ public class FSignUp extends Fragment implements View.OnClickListener {
                         Toast.makeText(context, "Please enable storage permission", Toast.LENGTH_SHORT).show();
                     }
                 }
-
-
             }
             break;
         }
-
-
     }
-
-
-    /*private void profilePicture() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setMessage("Complete This Action Using");
-        builder.setTitle("Please Confirm");
-        builder.setCancelable(false);
-        builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //pass false for open gallery to select one picture.
-                intentForOpenGallery(false);
-            }
-        }).setNegativeButton("Camera", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                intentForOpenCamera();
-            }
-        }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog1 = builder.create();
-        dialog1.show();
-    }
-
-    private void intentForOpenCamera() {
-        ask_CheckCameraStoragePermission_OpenCamera();
-    }
-
-    private void ask_CheckCameraStoragePermission_OpenCamera() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                    context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                String permissions[] = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                requestPermissions(permissions, IMAGE_PICK_GALLERY_CODE);
-            } else { // permission granted
-                openCamera();
-            }
-        } else {
-//            < M
-            openCamera();
-        }
-    }
-
-    private void openCamera() {
-        bImageFlag = true;
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(i, IMAGE_PICK_GALLERY_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == IMAGE_PICK_GALLERY_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            }
-        }
-    }
-*/
 
     private void signUp() {
 
@@ -612,7 +544,7 @@ public class FSignUp extends Fragment implements View.OnClickListener {
         return true;
     }
 
-    //Select image and set to imageView
+    //Select images and set to imageView
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {

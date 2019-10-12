@@ -37,7 +37,7 @@ public class CGetRequestBookingHistoryData {
 
     private FirebaseDatabase firebaseDatabase = null;
 
-    private String sUserId = null,
+    private String sHallId = null,
             sSubHallDocumentId = null,
             sHallMarquee = null;
 
@@ -58,7 +58,7 @@ public class CGetRequestBookingHistoryData {
         progressDialog = new ProgressDialog(context);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        sUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        sHallId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         SharedPreferences sp = context.getSharedPreferences("MHBAdmin", Context.MODE_PRIVATE);
 
@@ -72,7 +72,7 @@ public class CGetRequestBookingHistoryData {
 
     }
 
-    public void getRequestBookingHistoryData(final String sRequestBookingHistory) {
+    public void getRequestBookingDeniedData(final String sRequestBookingHistory) {
 
         final DatabaseReference databaseReference = firebaseDatabase
                 .getReference(sRequestBookingHistory)
@@ -104,7 +104,7 @@ public class CGetRequestBookingHistoryData {
                                             final DatabaseReference databaseReference1 = databaseReference
                                                     .child(sClientId)
                                                     .child(sHallMarquee + " Ids")
-                                                    .child(sUserId)
+                                                    .child(sHallId)
                                                     .child("Sub Hall Ids")
                                                     .child(sSubHallDocumentId)
                                                     .child("Timing");
@@ -115,9 +115,11 @@ public class CGetRequestBookingHistoryData {
                                                     if (dataSnapshot.exists()) {
 
                                                         for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
-                                                            final String sRequestTiming = dataSnapshot2.getKey();
-                                                            assert sRequestTiming != null;
-                                                            databaseReference1.child(sRequestTiming)
+
+                                                            final String sRequestCancelTiming = dataSnapshot2.getKey();
+
+                                                            assert sRequestCancelTiming != null;
+                                                            databaseReference1.child(sRequestCancelTiming)
                                                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                                                         @Override
                                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -126,16 +128,74 @@ public class CGetRequestBookingHistoryData {
                                                                                     dataSnapshot.getValue(CRequestBookingData.class);
 
                                                                             assert cRequestBookingData != null;
-                                                                            cRequestBookingData.setsAcceptDeniedTiming(sRequestTiming);
+                                                                            cRequestBookingData.setsAcceptDeniedTiming(sRequestCancelTiming);
 
                                                                             if (sRequestBookingHistory.equals("Booking Requests") ||
                                                                                     sRequestBookingHistory.equals("Canceled Requests")) {
                                                                                 FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
 
+                                                                                filterList.setsActivityName("DENIED");
+
                                                                                 filterLists.add(filterList);
                                                                                 requestBookingHistoryAdapter.notifyDataSetChanged();
+
                                                                             } else {
-                                                                                Toast.makeText(context, "Show Accepted and Booked", Toast.LENGTH_SHORT).show();
+
+                                                                                Date currentData = new Date();
+
+                                                                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+                                                                                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+                                                                                String sFunctionDate = cRequestBookingData.getsFunctionDate();
+
+                                                                                try {
+                                                                                    Date functionDate = dateFormat.parse(sFunctionDate);
+
+                                                                                    Date dayFunctionEndTime = timeFormat.parse("16:00:00");
+
+                                                                                    Date nightFunctionEndTime = timeFormat.parse("22:00:00");
+
+                                                                                    String sCurrentTime = timeFormat.format(currentData);
+
+                                                                                    Date currentTime = timeFormat.parse(sCurrentTime);
+
+                                                                                    assert functionDate != null;
+                                                                                    if (functionDate.compareTo(currentData) > 0 &&
+                                                                                            !sFunctionDate.equals(dateFormat.format(currentData))) {
+
+                                                                                        FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+                                                                                        filterList.setsActivityName("DENIED");
+
+                                                                                        filterLists.add(filterList);
+                                                                                        requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                    }
+                                                                                    if (sFunctionDate.equals(dateFormat.format(currentData))) {
+
+                                                                                        assert currentTime != null;
+                                                                                        if (cRequestBookingData.getsFunctionTiming().equals("Day")
+                                                                                                && currentTime.compareTo(dayFunctionEndTime) < 0) {
+
+                                                                                            FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+                                                                                            filterList.setsActivityName("DENIED");
+
+                                                                                            filterLists.add(filterList);
+                                                                                            requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                        } else {
+                                                                                            if (cRequestBookingData.getsFunctionTiming().equals("Night")
+                                                                                                    && currentTime.compareTo(nightFunctionEndTime) < 0) {
+
+                                                                                                FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+
+                                                                                                filterLists.add(filterList);
+                                                                                                requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                } catch (Exception e) {
+                                                                                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                                }
                                                                             }
                                                                         }
 
@@ -181,10 +241,10 @@ public class CGetRequestBookingHistoryData {
 
     }
 
-    public void getAcceptedRequestsData() {
+    public void getHistoryAcceptedRequestsData(String sHistoryAcceptedRequestsData) {
 
         final DatabaseReference databaseReference = firebaseDatabase
-                .getReference("Accepted Requests")
+                .getReference(sHistoryAcceptedRequestsData)
                 .child("User Ids");
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -210,13 +270,13 @@ public class CGetRequestBookingHistoryData {
                                             assert cUserData != null;
                                             cUserData.setsUserID(sClientId);
 
-                                            final DatabaseReference databaseReference1 =
-                                                    databaseReference.child(sClientId)
-                                                            .child(sHallMarquee + " Ids")
-                                                            .child(sUserId)
-                                                            .child("Sub Hall Ids")
-                                                            .child(sSubHallDocumentId)
-                                                            .child("Timing");
+                                            final DatabaseReference databaseReference1 = databaseReference
+                                                    .child(sClientId)
+                                                    .child(sHallMarquee + " Ids")
+                                                    .child(sHallId)
+                                                    .child("Sub Hall Ids")
+                                                    .child(sSubHallDocumentId)
+                                                    .child("Timing");
 
                                             databaseReference1
                                                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -229,10 +289,12 @@ public class CGetRequestBookingHistoryData {
                                                                     final String sAcceptTiming = dataSnapshot1.getKey();
 
                                                                     assert sAcceptTiming != null;
-                                                                    databaseReference1.child(sAcceptTiming)
+                                                                    databaseReference1
+                                                                            .child(sAcceptTiming)
                                                                             .addListenerForSingleValueEvent(new ValueEventListener() {
                                                                                 @Override
                                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                                                                                     if (dataSnapshot.exists()) {
 
                                                                                         final CRequestBookingData cRequestBookingData =
@@ -241,10 +303,65 @@ public class CGetRequestBookingHistoryData {
                                                                                         assert cRequestBookingData != null;
                                                                                         cRequestBookingData.setsAcceptDeniedTiming(sAcceptTiming);
 
-                                                                                        FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+                                                                                        Date currentData = new Date();
 
-                                                                                        filterLists.add(filterList);
-                                                                                        requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+                                                                                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+                                                                                        String sFunctionDate = cRequestBookingData.getsFunctionDate();
+
+                                                                                        try {
+                                                                                            Date functionDate = dateFormat.parse(sFunctionDate);
+
+                                                                                            Date dayFunctionEndTime = timeFormat.parse("16:00:00");
+
+                                                                                            Date nightFunctionEndTime = timeFormat.parse("22:00:00");
+
+                                                                                            String sCurrentTime = timeFormat.format(currentData);
+
+                                                                                            Date currentTime = timeFormat.parse(sCurrentTime);
+
+                                                                                            assert functionDate != null;
+                                                                                            if (currentData.compareTo(functionDate) > 0 &&
+                                                                                                    !sFunctionDate.equals(dateFormat.format(currentData))) {
+
+                                                                                                FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+
+                                                                                                filterList.setsActivityName("COMPLETED");
+
+                                                                                                filterLists.add(filterList);
+                                                                                                requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                            }
+                                                                                            if (sFunctionDate.equals(dateFormat.format(currentData))) {
+
+                                                                                                assert currentTime != null;
+                                                                                                if (cRequestBookingData.getsFunctionTiming().equals("Day")
+                                                                                                        && currentTime.compareTo(dayFunctionEndTime) > 0) {
+
+                                                                                                    FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+
+                                                                                                    filterList.setsActivityName("COMPLETED");
+
+                                                                                                    filterLists.add(filterList);
+                                                                                                    requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                                } else {
+                                                                                                    if (cRequestBookingData.getsFunctionTiming().equals("Night")
+                                                                                                            && currentTime.compareTo(nightFunctionEndTime) > 0) {
+
+                                                                                                        FilterLists filterList = new FilterLists(cUserData, cRequestBookingData);
+
+                                                                                                        filterList.setsActivityName("COMPLETED");
+
+                                                                                                        filterLists.add(filterList);
+                                                                                                        requestBookingHistoryAdapter.notifyDataSetChanged();
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+
+                                                                                        } catch (Exception e) {
+                                                                                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                                        }
                                                                                     }
                                                                                 }
 
@@ -314,7 +431,7 @@ public class CGetRequestBookingHistoryData {
                                             final DatabaseReference databaseReference1 =
                                                     databaseReference.child(sClientId)
                                                             .child(sHallMarquee + " Ids")
-                                                            .child(sUserId)
+                                                            .child(sHallId)
                                                             .child("Sub Hall Ids");
 
                                             databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -480,7 +597,7 @@ public class CGetRequestBookingHistoryData {
                                             final DatabaseReference databaseReference1 =
                                                     databaseReference.child(sClientId)
                                                             .child(sHallMarquee + " Ids")
-                                                            .child(sUserId)
+                                                            .child(sHallId)
                                                             .child("Sub Hall Ids");
 
                                             databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
