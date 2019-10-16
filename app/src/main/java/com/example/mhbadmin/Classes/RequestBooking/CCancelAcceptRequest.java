@@ -14,7 +14,7 @@ import com.example.mhbadmin.Activities.DashBoardActivity;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Notification.APIService;
 import com.example.mhbadmin.Notification.Sending.Client;
-import com.example.mhbadmin.Notification.Sending.Data;
+import com.example.mhbadmin.Notification.Data;
 import com.example.mhbadmin.Notification.Sending.MyResponse;
 import com.example.mhbadmin.Notification.Sending.Sender;
 import com.example.mhbadmin.Notification.Token;
@@ -45,7 +45,8 @@ public class CCancelAcceptRequest {
     private String sUserId = null,
             sHallId = null,
             sHallMarquee = null,
-            sRefAddress = null;
+            sRefAddress = null,
+            sSignUpData = null;
 
     private APIService apiService = null;
 
@@ -94,6 +95,9 @@ public class CCancelAcceptRequest {
 
         if (sp.getString(META_DATA, null) != null)
             sHallMarquee = sp.getString(META_DATA, null);
+
+        if (sp.getString("sSignUpData", null) != null)
+            sSignUpData = sp.getString("sSignUpData", null);
 
         if (sRefAddress.equals("Accepted Requests"))
             checkPreviousBookings();
@@ -252,14 +256,21 @@ public class CCancelAcceptRequest {
                             String sToken = dataSnapshot.getValue(String.class);
                             Token token = new Token(sToken);
 
-                            String sTitle = null;
-                            if (sRefAddress.equals("Canceled Requests"))
+                            String sTitle = null,
+                                    sBody = null;
+
+                            if (sRefAddress.equals("Canceled Requests")) {
                                 sTitle = "Request Denied";
-                            else if (sRefAddress.equals("Accepted Requests"))
+                                sBody = "Your request at " + cRequestBookingData.getsFunctionTiming() + " " + cRequestBookingData.getsFunctionDate() +
+                                        "has been Denied";
+                            } else if (sRefAddress.equals("Accepted Requests")) {
                                 sTitle = "Request Accepted";
+                                sBody = "Your request at " + cRequestBookingData.getsFunctionTiming() + " " + cRequestBookingData.getsFunctionDate() +
+                                        "has been Accepted";
+                            }
+
                             Data data = new Data(sHallId, R.drawable.ic_add_picture_, sTitle,
-                                    cRequestBookingData.getsFunctionTiming() + " " + cRequestBookingData.getsFunctionDate(),
-                                    sUserId, cRequestBookingData.getsSubHallId(), new Gson().toJson(userData),
+                                    sBody, sUserId, cRequestBookingData.getsSubHallId(), new Gson().toJson(sSignUpData),
                                     new Gson().toJson(cRequestBookingData));
 
                             Sender sender = new Sender(data, token.getToken());

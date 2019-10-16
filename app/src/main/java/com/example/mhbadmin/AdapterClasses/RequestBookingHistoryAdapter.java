@@ -197,7 +197,7 @@ public class RequestBookingHistoryAdapter extends RecyclerView.Adapter<RequestBo
             Glide.with(context)
                     .load(filterLists.get(position)
                             .getcUserDataList().getsUserProfileImageUri())
-.placeholder(R.drawable.ic_loading_image)
+                    .placeholder(R.drawable.ic_loading_image)
                     .into(ivUserProfile);
 
             btnMessage.setOnClickListener(new View.OnClickListener() {

@@ -19,7 +19,7 @@ import java.util.List;
 
 import io.objectbox.Box;
 
-public class BNotification extends BroadcastReceiver {
+public class BRNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

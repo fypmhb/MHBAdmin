@@ -13,9 +13,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.mhbadmin.Classes.Models.CSubHallData;
 import com.example.mhbadmin.Fragments.FUpdateSubHallInfo;
 import com.example.mhbadmin.R;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import static com.example.mhbadmin.Activities.DashBoardActivity.SUB_HALL_COUNTER;
 
@@ -107,7 +109,9 @@ public class UpdateSubHallInfoActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Sub Hall " + (position + 1);
+            String sSubHallObject = sp.getString("sSubHallObject" + (position + 1), null);
+            CSubHallData subHallObject = new Gson().fromJson(sSubHallObject, CSubHallData.class);
+            return subHallObject.getsSubHallName();
         }
     }
 }

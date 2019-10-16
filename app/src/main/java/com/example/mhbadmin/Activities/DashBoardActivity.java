@@ -26,7 +26,7 @@ import com.bumptech.glide.Glide;
 import com.example.mhbadmin.Activities.FragmentRelated.RequestBookingHistoryListActivity;
 import com.example.mhbadmin.Activities.FragmentRelated.ShowDeleteSubHallActivity;
 import com.example.mhbadmin.AdapterClasses.ImageSwipeAdapter;
-import com.example.mhbadmin.BroadcastReceiver.BNotification;
+import com.example.mhbadmin.BroadcastReceiver.BRNotification;
 import com.example.mhbadmin.Classes.CNetworkConnection;
 import com.example.mhbadmin.Classes.Models.CRequestBookingData;
 import com.example.mhbadmin.Classes.Models.CSignUpData;
@@ -113,7 +113,7 @@ public class DashBoardActivity extends AppCompatActivity
 
         connectivity();
 
-        startService(new Intent(getApplicationContext(), BNotification.class));
+        startService(new Intent(getApplicationContext(), BRNotification.class));
 
         setSupportActionBar(toolbar);
 
@@ -396,6 +396,15 @@ public class DashBoardActivity extends AppCompatActivity
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             cSignUpData = dataSnapshot.getValue(CSignUpData.class);
+
+
+                            Gson gson = new Gson();
+
+                            String sSignUpData = gson.toJson(cSignUpData);
+
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putString("sSignUpData", sSignUpData);
+                            editor.commit();
                             getSubHallNumbers();
                         }
                     }

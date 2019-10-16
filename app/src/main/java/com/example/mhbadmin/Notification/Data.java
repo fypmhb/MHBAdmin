@@ -1,4 +1,4 @@
-package com.example.mhbadmin.Notification.Sending;
+package com.example.mhbadmin.Notification;
 
 public class Data {
 

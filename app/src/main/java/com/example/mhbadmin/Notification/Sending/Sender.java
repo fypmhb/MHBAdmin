@@ -1,5 +1,7 @@
 package com.example.mhbadmin.Notification.Sending;
 
+import com.example.mhbadmin.Notification.Data;
+
 public class Sender {
 
     public Data data;

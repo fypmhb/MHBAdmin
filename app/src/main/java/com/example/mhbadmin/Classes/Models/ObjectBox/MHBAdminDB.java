@@ -8,7 +8,7 @@ import android.content.Intent;
 
 import androidx.multidex.MultiDex;
 
-import com.example.mhbadmin.BroadcastReceiver.BNotification;
+import com.example.mhbadmin.BroadcastReceiver.BRNotification;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -42,7 +42,7 @@ public class MHBAdminDB extends Application {
             notificationTime.add(Calendar.DATE, 1);
         }*/
 
-        Intent intent = new Intent(this, BNotification.class);
+        Intent intent = new Intent(this, BRNotification.class);
 
         int j = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 

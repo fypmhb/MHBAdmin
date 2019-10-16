@@ -112,7 +112,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".BroadcastReceiver.BNotification" />
+        <receiver android:name=".BroadcastReceiver.BRNotification" />
 
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
 
